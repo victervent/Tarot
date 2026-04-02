@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarot motkiki</title>
+     <link rel="icon" type="image/x-icon" href="https://m.gettywallpapers.com/wp-content/uploads/2023/07/Ganyu-icon.jpg">
+
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Quicksand:wght@300;500;700&display=swap');
+        :root {
+            --gold: #d4af37;
+            --dark-purple: #1a0b2e;
+            --neon-purple: #9d4edd;
+            --bg-color: #0d0514;
+        }
+        body { margin: 0; min-height: 100vh; background: radial-gradient(circle at top, #2a114d 0%, var(--bg-color) 100%); font-family: 'Quicksand', sans-serif; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; background-image: radial-gradient(1px 1px at 20px 30px, #eee, rgba(0,0,0,0)); background-repeat: repeat; background-size: 200px 200px; opacity: 0.5; }
+        h1 { font-family: 'Cinzel Decorative', cursive; color: var(--gold); text-shadow: 0 0 15px var(--neon-purple); text-align: center; margin-bottom: 10px; }
+        .menu-container { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; }
+        .menu-btn { background: rgba(26, 11, 46, 0.8); border: 1px solid var(--gold); color: var(--gold); padding: 10px 20px; font-family: 'Quicksand', sans-serif; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
+        .menu-btn:hover, .menu-btn.active { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
+        .controls { margin-bottom: 40px; text-align: center; width: 100%; max-width: 600px; }
+        .draw-btn { background: transparent; border: 2px solid var(--neon-purple); color: white; padding: 14px 40px; font-size: 1.2rem; font-family: 'Cinzel Decorative', cursive; cursor: pointer; border-radius: 50px; transition: all 0.3s ease; }
+        .draw-btn:hover { background: var(--neon-purple); box-shadow: 0 0 25px var(--neon-purple); }
+
+        /* NÚT RÚT LÁ PHỤ – ĐÃ ĐẨY XUỐNG THẤP HƠN, TO HƠN, ĐẸP HƠN */
+        .clarify-btn {
+            background: rgba(157, 78, 221, 0.2);
+            border: 2px solid var(--neon-purple);
+            color: var(--neon-purple);
+            padding: 10px 30px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 25px; /* ĐÃ ĐẨY XUỐNG RẤT RÕ */
+            box-shadow: 0 0 15px rgba(157, 78, 221, 0.5);
+            letter-spacing: 1px;
+        }
+        .clarify-btn:hover {
+            background: var(--neon-purple);
+            color: #fff;
+            box-shadow: 0 0 25px var(--neon-purple);
+            transform: translateY(-3px);
+        }
+
+        .spread-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; max-width: 1200px; margin-bottom: 40px; position: relative; }
+        .card-wrapper { display: flex; flex-direction: column; align-items: center; width: 160px; position: relative; margin-bottom: 160px; }
+        .position-label { color: var(--neon-purple); font-weight: bold; text-align: center; height: 50px; margin-bottom: 5px; font-size: 0.9rem; }
+        .card-container { width: 160px; height: 270px; perspective: 1000px; position: relative; }
+        .tarot-card { width: 100%; height: 100%; position: absolute; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; cursor: pointer; }
+        .tarot-card.flipped { transform: rotateY(180deg); }
+        .card-face { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px solid var(--gold); }
+        .card-back { background: linear-gradient(135deg, #1a0b2e, #4c1d95); background-image: repeating-linear-gradient(45deg, rgba(212,175,55,0.1) 25%, transparent 25%, transparent 75%, rgba(212,175,55,0.1) 75%); background-size: 20px 20px; }
+        .card-back::after { content: '✧'; font-size: 2.5rem; color: var(--gold); }
+        .card-front { background: #111; transform: rotateY(180deg); padding: 10px; text-align: center; }
+        .card-emoji { font-size: 2.5rem; margin-bottom: 10px; transition: transform 0.4s; }
+        .card-name { font-family: 'Cinzel Decorative', cursive; font-size: 1rem; color: var(--gold); }
+        .reversed .card-emoji { transform: rotate(180deg) !important; filter: brightness(0.85) saturate(1.3); }
+
+        .clarifier-card { position: absolute; bottom: -72px; right: -88px; width: 115px; height: 172px; z-index: 15; transform: rotate(12deg); box-shadow: -10px 12px 25px rgba(0,0,0,0.85); border: 3px solid var(--neon-purple); border-radius: 12px; overflow: hidden; opacity: 0; }
+        .clarifier-inner { width: 100%; height: 100%; perspective: 1000px; position: relative; }
+        .clarifier-tarot { width: 100%; height: 100%; position: absolute; transition: transform 0.9s cubic-bezier(0.68, -0.55, 0.27, 1.55); transform-style: preserve-3d; }
+        .clarifier-tarot.flipped { transform: rotateY(180deg); }
+        .clarifier-face { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; border-radius: 9px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .clarifier-back { background: linear-gradient(135deg, #1a0b2e, #4c1d95); background-image: repeating-linear-gradient(45deg, rgba(212,175,55,0.15) 25%, transparent 25%, transparent 75%, rgba(212,175,55,0.15) 75%); }
+        .clarifier-front { background: linear-gradient(135deg, #221, #3a1f5e); border: 2px solid var(--gold); transform: rotateY(180deg); padding: 8px; }
+        .clarifier-emoji { font-size: 2.4rem; margin-bottom: 6px; transition: transform 0.4s; }
+        .clarifier-name { font-size: 0.82rem; color: var(--gold); text-align: center; }
+        .clarifier-label { font-size: 0.68rem; color: var(--gold); position: absolute; bottom: 8px; letter-spacing: 1px; }
+        @keyframes clarifierFlyIn { 0% { opacity: 0; transform: translateY(80px) rotate(-45deg) scale(0.3); } 100% { opacity: 1; transform: translateY(0) rotate(12deg) scale(1); } }
+        .clarifier-card.anim-in { animation: clarifierFlyIn 0.9s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; }
+        .clarifier-card.reversed .clarifier-emoji { transform: rotate(180deg) !important; filter: brightness(0.85) saturate(1.3); }
+        @keyframes flyIn { 0% { opacity: 0; transform: translateY(120px) rotate(-25deg) scale(0.4); } 100% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); } }
+        .spread-container.shuffling .card-wrapper { animation: flyIn 0.9s cubic-bezier(0.68, -0.55, 0.27, 1.55) backwards; }
+        .reading-panel { width: 90%; max-width: 820px; background: rgba(26, 11, 46, 0.9); border: 1px solid var(--gold); border-radius: 15px; padding: 25px; display: none; margin-bottom: 50px; }
+        .reading-panel.show { display: block; }
+        .detail-box { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dashed rgba(157, 78, 221, 0.4); }
+        .detail-title { color: var(--gold); font-weight: bold; font-size: 1.1rem; }
+        .layer-box { background: rgba(255,255,255,0.06); border-left: 5px solid var(--neon-purple); padding: 15px 20px; margin: 15px 0; border-radius: 10px; font-size: 0.96rem; line-height: 1.65; }
+        .clarifier-text { color: var(--neon-purple); font-style: italic; margin-top: 12px; font-size: 0.95rem; border-left: 3px solid var(--neon-purple); padding-left: 12px; }
+        .summary-box { background: rgba(157, 78, 221, 0.1); border: 1px solid var(--neon-purple); padding: 25px; border-radius: 12px; margin-top: 25px; }
+        .summary-title { color: var(--gold); font-family: 'Cinzel Decorative', cursive; font-size: 1.35rem; margin-bottom: 12px; text-align: center; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: #1a0b2e; border: 2px solid var(--gold); border-radius: 15px; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; padding: 25px; }
+        .history-item { margin-bottom: 15px; padding: 15px; background: rgba(157,78,221,0.1); border-radius: 10px; border: 1px solid var(--gold); cursor: pointer; transition: all 0.3s; }
+        .history-item:hover { background: rgba(157,78,221,0.25); transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+  <div class="stars"></div>
+    <canvas id="particleCanvas" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:2; opacity:0.7;"></canvas>
+    <h1>Tarot Universe</h1>
+   
+    <div class="menu-container">
+        <button class="menu-btn active" onclick="setSpreadType('love')">Tình Yêu (3 Lá)</button>
+        <button class="menu-btn" onclick="setSpreadType('career')">Sự Nghiệp (4 Lá)</button>
+        <button class="menu-btn" onclick="setSpreadType('journey')">Hành Trình (5 Lá)</button>
+        <button class="menu-btn" onclick="showHistory()">📖 Lịch sử trải bài</button>
+    </div>
+    <div class="controls">
+        <button class="draw-btn" id="startBtn" onclick="startSpread()">BẮT ĐẦU XÁO BÀI</button>
+    </div>
+    <div class="spread-container" id="spreadContainer"></div>
+    <div class="reading-panel" id="readingPanel">
+        <div style="text-align:center; margin-bottom:20px;">
+            <h2 id="readingHeader" style="color:var(--gold); margin:0;"></h2>
+        </div>
+        <h2 style="color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold); padding-bottom: 10px;">Phân Tích Chi Tiết – Nhiều Tầng Lớp Ý Nghĩa</h2>
+        <div id="detailsContainer"></div>
+       
+        <div style="text-align:center; margin:25px 0;">
+            <button class="menu-btn" onclick="saveReading()" style="padding:12px 28px; font-size:1rem;">💾 Lưu trải bài này</button>
+        </div>
+        <div class="summary-box" id="summaryBox" style="display:none;">
+            <div class="summary-title">Thông Điệp Liên Kết Từ Vũ Trụ</div>
+            <div id="summaryText" style="line-height:1.6;"></div>
+        </div>
+        <div style="text-align:center; margin-top:20px;">
+            <button class="menu-btn" id="summaryBtn" onclick="generateSummary()" style="display:none;">Tổng Hợp Thông Điệp Đa Chiều</button>
+        </div>
+    </div>
+    <!-- Modal Lịch sử -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <h2 style="color:var(--gold); text-align:center;">📖 Lịch Sử Trải Bài</h2>
+            <div id="historyList"></div>
+            <button class="menu-btn" onclick="hideHistory()" style="margin-top:20px; display:block; margin-left:auto;">Đóng</button>
+            <button onclick="clearHistory()" style="margin-top:10px; background:#ff4444; border:none; color:white; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:0.9rem;">Xóa toàn bộ lịch sử</button>
+        </div>
+    </div>
+
+    <script>
+        // ====================== BỘ BÀI TAROT 78 LÁ ======================
+        const deck = [
+            // Ẩn Chính
+            { id: "the-fool", name: "The Fool", emoji: "🎭", reversedEmoji: "🎭", keyword: "khởi đầu mới, liều lĩnh nhưng cần thiết", reversedKeyword: "liều lĩnh mù quáng, do dự, thiếu chuẩn bị",
+              meaning: "Lá bài mở đầu hành trình, tượng trưng cho tinh thần phiêu lưu, sự ngây thơ và lòng tin tuyệt đối vào cuộc sống. Bạn đang đứng trước một cánh cửa mới, hãy dũng cảm bước ra dù chưa biết hết con đường.",
+              reversedMeaning: "Bạn đang đứng trước rủi ro không cần thiết hoặc do dự quá lâu. Hãy dừng lại, lập kế hoạch rõ ràng trước khi nhảy vọt, tránh hành động impulsively." },
+            { id: "the-magician", name: "The Magician", emoji: "✨", reversedEmoji: "✨", keyword: "làm chủ kỹ năng và nguồn lực", reversedKeyword: "thao túng, thiếu kỹ năng hoặc trì hoãn",
+              meaning: "Bạn sở hữu tất cả công cụ, tài năng và sức mạnh để biến ý tưởng thành hiện thực. Đây là lúc hành động quyết liệt.",
+              reversedMeaning: "Sức mạnh của bạn đang bị lạm dụng hoặc bạn đang tự lừa dối bản thân. Hãy kiểm tra lại kỹ năng và ý định trước khi hành động." },
+            { id: "the-high-priestess", name: "The High Priestess", emoji: "🌙", reversedEmoji: "🌙", keyword: "trực giác và sự bí ẩn", reversedKeyword: "bí mật bị che giấu, thiếu tin tưởng trực giác",
+              meaning: "Lá bài của nội tâm sâu thẳm, trực giác mạnh mẽ và những điều chưa được tiết lộ. Hãy lắng nghe giọng nói bên trong.",
+              reversedMeaning: "Bạn đang bỏ qua trực giác hoặc có bí mật đang kìm hãm. Hãy dừng lại và lắng nghe tiếng lòng thay vì chạy theo logic bề mặt." },
+            { id: "the-empress", name: "The Empress", emoji: "🌺", reversedEmoji: "🌺", keyword: "nuôi dưỡng và sự phong phú", reversedKeyword: "thiếu sáng tạo, phụ thuộc hoặc bế tắc",
+              meaning: "Năng lượng nữ tính, sáng tạo và dồi dào. Đây là lúc bạn được khuyến khích chăm sóc bản thân và để mọi thứ phát triển tự nhiên.",
+              reversedMeaning: "Sự sáng tạo đang bị kìm hãm hoặc bạn đang quá phụ thuộc vào người khác. Hãy tìm lại sự cân bằng và nuôi dưỡng chính mình." },
+            { id: "the-emperor", name: "The Emperor", emoji: "👑", reversedEmoji: "👑", keyword: "cấu trúc và quyền lực", reversedKeyword: "thiếu kỷ luật, độc đoán hoặc bất ổn",
+              meaning: "Sự ổn định, kỷ luật và quyền lãnh đạo. Lá bài nhắc bạn xây dựng nền tảng vững chắc.",
+              reversedMeaning: "Quyền lực đang bị lạm dụng hoặc bạn đang thiếu cấu trúc. Hãy kiểm soát cảm xúc và xây dựng lại kỷ luật." },
+            { id: "the-hierophant", name: "The Hierophant", emoji: "⛪", reversedEmoji: "⛪", keyword: "truyền thống và hướng dẫn tinh thần", reversedKeyword: "phá vỡ quy tắc, nổi loạn hoặc mù quáng theo đám đông",
+              meaning: "Bạn đang được khuyên nên tìm kiếm lời khuyên từ người có kinh nghiệm hoặc tuân theo các nguyên tắc đã được kiểm chứng.",
+              reversedMeaning: "Bạn cần phá vỡ quy tắc cũ để tìm con đường riêng. Đừng mù quáng theo truyền thống." },
+            { id: "the-lovers", name: "The Lovers", emoji: "💞", reversedEmoji: "💞", keyword: "hòa hợp và lựa chọn quan trọng", reversedKeyword: "mất cân bằng, lựa chọn sai lầm hoặc chia ly",
+              meaning: "Tình yêu sâu sắc, sự gắn kết và quyết định mang tính định mệnh.",
+              reversedMeaning: "Có sự mất hài hòa trong mối quan hệ hoặc bạn đang đứng trước lựa chọn sai lầm. Hãy xem xét lại giá trị cốt lõi." },
+            { id: "the-chariot", name: "The Chariot", emoji: "🏇", reversedEmoji: "🏇", keyword: "quyết tâm tiến về phía trước", reversedKeyword: "mất kiểm soát, hướng đi sai hoặc cản trở",
+              meaning: "Bạn đang kiểm soát tốt cảm xúc và hướng đi. Với ý chí mạnh mẽ, bạn sẽ vượt qua mọi chướng ngại.",
+              reversedMeaning: "Bạn đang mất kiểm soát hoặc đi sai hướng. Hãy dừng lại, điều chỉnh và lấy lại sự cân bằng." },
+            { id: "strength", name: "Strength", emoji: "🦁", reversedEmoji: "🦁", keyword: "sức mạnh nội tại và kiên nhẫn", reversedKeyword: "yếu đuối nội tâm, thiếu tự tin hoặc mất kiên nhẫn",
+              meaning: "Không phải sức mạnh thô bạo, mà là sức mạnh dịu dàng của lòng dũng cảm và kiên nhẫn.",
+              reversedMeaning: "Bạn đang tự nghi ngờ bản thân hoặc mất kiên nhẫn. Hãy tìm lại sức mạnh nội tại." },
+            { id: "the-hermit", name: "The Hermit", emoji: "🏔️", reversedEmoji: "🏔️", keyword: "suy tư và tìm kiếm nội tâm", reversedKeyword: "cô lập, tránh né hoặc thiếu hướng dẫn",
+              meaning: "Thời gian cần thiết để rút lui, chiêm nghiệm và tìm ánh sáng bên trong.",
+              reversedMeaning: "Bạn đang cô lập quá mức hoặc đang tránh né sự thật. Hãy tìm sự cân bằng giữa nội tâm và thế giới bên ngoài." },
+            { id: "wheel-of-fortune", name: "Wheel of Fortune", emoji: "🔄", reversedEmoji: "🔄", keyword: "vận mệnh và chu kỳ thay đổi", reversedKeyword: "chu kỳ xấu, vận rủi hoặc kháng cự thay đổi",
+              meaning: "Cuộc sống luôn chuyển động. Những thay đổi bất ngờ đang đến.",
+              reversedMeaning: "Bạn đang kháng cự thay đổi hoặc đang trong chu kỳ khó khăn. Hãy chấp nhận và học hỏi." },
+            { id: "justice", name: "Justice", emoji: "⚖️", reversedEmoji: "⚖️", keyword: "công bằng và sự thật", reversedKeyword: "bất công, tránh né trách nhiệm hoặc sai lầm",
+              meaning: "Hậu quả của hành động trước đây sẽ trở lại. Lá bài nhắc nhở bạn sống đúng đắn.",
+              reversedMeaning: "Có sự bất công hoặc bạn đang tránh né trách nhiệm. Công lý sẽ được thực thi theo cách khắc nghiệt hơn." },
+            { id: "the-hanged-man", name: "The Hanged Man", emoji: "🙃", reversedEmoji: "🙃", keyword: "buông bỏ và góc nhìn mới", reversedKeyword: "bế tắc, hy sinh vô ích hoặc kháng cự buông bỏ",
+              meaning: "Đôi khi phải tạm dừng hoặc hy sinh để thấy rõ hơn.",
+              reversedMeaning: "Bạn đang bám víu vào điều không nên hoặc đang trong trạng thái bế tắc. Hãy buông tay." },
+            { id: "death", name: "Death", emoji: "💀", reversedEmoji: "💀", keyword: "kết thúc và chuyển hóa", reversedKeyword: "kháng cự thay đổi, kết thúc kéo dài hoặc sợ hãi",
+              meaning: "Không phải cái chết vật lý, mà là sự kết thúc của một giai đoạn để nhường chỗ cho cái mới.",
+              reversedMeaning: "Bạn đang kháng cự sự thay đổi cần thiết. Hãy chấp nhận để tái sinh." },
+            { id: "temperance", name: "Temperance", emoji: "🧪", reversedEmoji: "🧪", keyword: "cân bằng và điều hòa", reversedKeyword: "mất cân bằng, cực đoan hoặc xung đột nội tâm",
+              meaning: "Sự hài hòa giữa các mặt đối lập. Lá bài khuyên bạn kiên nhẫn.",
+              reversedMeaning: "Bạn đang mất cân bằng nghiêm trọng. Hãy tìm lại sự điều hòa trước khi mọi thứ đổ vỡ." },
+            { id: "the-devil", name: "The Devil", emoji: "😈", reversedEmoji: "😈", keyword: "xiềng xích và dục vọng", reversedKeyword: "giải thoát, vượt qua nghiện ngập hoặc tự do",
+              meaning: "Bạn đang bị ràng buộc bởi thói quen, sợ hãi hoặc ham muốn vật chất.",
+              reversedMeaning: "Bạn đã sẵn sàng phá bỏ xiềng xích. Đây là lúc giải thoát bản thân." },
+            { id: "the-tower", name: "The Tower", emoji: "🌩️", reversedEmoji: "🌩️", keyword: "sụp đổ đột ngột để xây lại", reversedKeyword: "tránh né sụp đổ, khủng hoảng kéo dài hoặc sợ thay đổi",
+              meaning: "Một cú sốc lớn sẽ phá hủy nền tảng cũ, nhưng đó là cơ hội để xây dựng lại.",
+              reversedMeaning: "Bạn đang cố tránh né sự thật hoặc khủng hoảng đang kéo dài. Hãy đối mặt để tái xây dựng." },
+            { id: "the-star", name: "The Star", emoji: "⭐", reversedEmoji: "⭐", keyword: "hy vọng, chữa lành và niềm tin", reversedKeyword: "mất hy vọng, kiệt sức hoặc nghi ngờ",
+              meaning: "Sau giông bão là bình yên. Lá bài mang lại sự chữa lành và niềm tin.",
+              reversedMeaning: "Bạn đang mất hy vọng hoặc kiệt sức. Hãy tìm lại ánh sáng nội tại." },
+            { id: "the-moon", name: "The Moon", emoji: "🌕", reversedEmoji: "🌕", keyword: "ảo ảnh và trực giác", reversedKeyword: "ảo tưởng tan vỡ, lừa dối hoặc hoang mang",
+              meaning: "Thời kỳ có nhiều điều chưa rõ ràng. Hãy tin vào trực giác.",
+              reversedMeaning: "Ảo tưởng đang tan vỡ hoặc bạn đang bị lừa dối. Sự thật sẽ lộ diện nhưng gây đau đớn." },
+            { id: "the-sun", name: "The Sun", emoji: "☀️", reversedEmoji: "☀️", keyword: "thành công rực rỡ và niềm vui", reversedKeyword: "tạm thời tối tăm, thành công bị trì hoãn hoặc thiếu năng lượng",
+              meaning: "Lá bài hạnh phúc nhất. Mọi thứ rõ ràng, tích cực và tràn đầy năng lượng.",
+              reversedMeaning: "Niềm vui đang bị che khuất tạm thời. Hãy kiên nhẫn, ánh sáng sẽ trở lại." },
+            { id: "judgement", name: "Judgement", emoji: "📯", reversedEmoji: "📯", keyword: "tỉnh thức và tái sinh", reversedKeyword: "tự phán xét, trì hoãn tỉnh thức hoặc hối tiếc",
+              meaning: "Lời kêu gọi từ vũ trụ để bạn thức tỉnh và tha thứ cho quá khứ.",
+              reversedMeaning: "Bạn đang tự phán xét bản thân hoặc đang trì hoãn sự tái sinh. Hãy tha thứ và bước tiếp." },
+            { id: "the-world", name: "The World", emoji: "🌍", reversedEmoji: "🌍", keyword: "hoàn thành và toàn vẹn", reversedKeyword: "kết thúc dang dở, thiếu hoàn thiện hoặc vòng lặp",
+              meaning: "Kết thúc một chu kỳ lớn, đạt được mục tiêu và cảm giác trọn vẹn.",
+              reversedMeaning: "Bạn đang trong vòng lặp hoặc kết thúc chưa hoàn hảo. Hãy hoàn tất bài học cuối cùng." },
+            // Cốc (Cups)
+            { id: "ace-of-cups", name: "Ace of Cups", emoji: "1️⃣🍷", reversedEmoji: "1️⃣🍷", keyword: "cảm xúc tuôn trào, tình yêu mới", reversedKeyword: "cảm xúc bị tắc nghẽn, mất kết nối",
+              meaning: "Nguồn cảm xúc dâng trào, tình yêu thương và sự khởi đầu của mối quan hệ sâu sắc.",
+              reversedMeaning: "Cảm xúc đang bị kìm hãm hoặc bạn đang đóng cửa trái tim. Hãy mở lòng trở lại." },
+            { id: "two-of-cups", name: "Two of Cups", emoji: "2️⃣🥂", reversedEmoji: "2️⃣🥂", keyword: "kết nối sâu sắc và đối tác", reversedKeyword: "chia ly, mất cân bằng mối quan hệ",
+              meaning: "Sự gắn kết hài hòa, tình yêu đôi lứa hoặc quan hệ đối tác ăn ý.",
+              reversedMeaning: "Mối quan hệ đang mất cân bằng hoặc có nguy cơ chia ly. Hãy giao tiếp chân thành." },
+            { id: "three-of-cups", name: "Three of Cups", emoji: "3️⃣🎉", reversedEmoji: "3️⃣🎉", keyword: "vui vẻ, tình bạn và kỷ niệm", reversedKeyword: "xung đột nhóm, cô lập hoặc tiệc tùng quá mức",
+              meaning: "Thời gian sum vầy, ăn mừng cùng bạn bè, gia đình.",
+              reversedMeaning: "Có xung đột trong nhóm hoặc bạn đang cảm thấy cô lập. Hãy tìm lại sự gắn kết." },
+            { id: "four-of-cups", name: "Four of Cups", emoji: "4️⃣🍷", reversedEmoji: "4️⃣🍷", keyword: "suy tư, thờ ơ với cơ hội", reversedKeyword: "chấp nhận cơ hội, thoát khỏi thờ ơ",
+              meaning: "Bạn đang chán nản hoặc bỏ lỡ cơ hội vì nhìn vào bên trong quá nhiều.",
+              reversedMeaning: "Bạn đã sẵn sàng mở mắt và đón nhận cơ hội mới. Đừng bỏ lỡ nữa." },
+            { id: "five-of-cups", name: "Five of Cups", emoji: "5️⃣💔", reversedEmoji: "5️⃣💔", keyword: "nỗi đau mất mát và thất vọng", reversedKeyword: "chữa lành, chấp nhận và nhìn thấy hy vọng",
+              meaning: "Bạn đang tập trung vào những gì đã mất, nhưng vẫn còn hai cốc đầy phía sau.",
+              reversedMeaning: "Bạn đang bắt đầu chữa lành và thấy được những gì còn lại. Hy vọng đang trở lại." },
+            { id: "six-of-cups", name: "Six of Cups", emoji: "6️⃣🧸", reversedEmoji: "6️⃣🧸", keyword: "hoài niệm, tuổi thơ và sự trong sáng", reversedKeyword: "bám víu quá khứ, không trưởng thành",
+              meaning: "Ký ức đẹp, sự ngây thơ, quà tặng từ quá khứ hoặc người cũ trở lại.",
+              reversedMeaning: "Bạn đang bám víu quá khứ và không tiến về phía trước. Hãy buông bỏ để trưởng thành." },
+            { id: "seven-of-cups", name: "Seven of Cups", emoji: "7️⃣🌫️", reversedEmoji: "7️⃣🌫️", keyword: "ảo tưởng và nhiều lựa chọn", reversedKeyword: "thực tế, lựa chọn rõ ràng hoặc tỉnh táo",
+              meaning: "Bạn đang có quá nhiều lựa chọn, một số chỉ là ảo mộng.",
+              reversedMeaning: "Bạn đã tỉnh táo và đang phân biệt được thực tế. Hãy chọn lựa khôn ngoan." },
+            { id: "eight-of-cups", name: "Eight of Cups", emoji: "8️⃣🚶", reversedEmoji: "8️⃣🚶", keyword: "bước đi tìm kiếm ý nghĩa sâu hơn", reversedKeyword: "trở lại, sợ hãi thay đổi hoặc bám víu",
+              meaning: "Bạn nhận ra những gì mình có không còn đủ, cần rời bỏ để tìm kiếm điều ý nghĩa hơn.",
+              reversedMeaning: "Bạn đang do dự hoặc muốn quay lại. Hãy dũng cảm bước tiếp." },
+            { id: "nine-of-cups", name: "Nine of Cups", emoji: "9️⃣😊", reversedEmoji: "9️⃣😊", keyword: "điều ước thành hiện thực và mãn nguyện", reversedKeyword: "mãn nguyện giả tạo, kiêu ngạo hoặc chưa đủ",
+              meaning: "Lá bài hạnh phúc nhất trong bộ Cốc. Bạn đang đạt được những gì mình mong muốn.",
+              reversedMeaning: "Sự mãn nguyện đang bị che khuất hoặc bạn đang kiêu ngạo. Hãy khiêm tốn hơn." },
+            { id: "ten-of-cups", name: "Ten of Cups", emoji: "🔟🏡", reversedEmoji: "🔟🏡", keyword: "hạnh phúc gia đình và viên mãn", reversedKeyword: "gia đình bất hòa, tan vỡ hoặc ảo mộng",
+              meaning: "Hài hòa gia đình, tình yêu lâu dài và cảm giác 'happy ever after'.",
+              reversedMeaning: "Có xung đột gia đình hoặc hạnh phúc đang bị đe dọa. Hãy chữa lành mối quan hệ." },
+            { id: "page-of-cups", name: "Page of Cups", emoji: "👦🍷", reversedEmoji: "👦🍷", keyword: "tin nhắn tình cảm, sáng tạo trẻ trung", reversedKeyword: "tin xấu tình cảm, thiếu trưởng thành cảm xúc",
+              meaning: "Tin tốt về tình cảm hoặc ý tưởng sáng tạo trẻ trung.",
+              reversedMeaning: "Có tin xấu tình cảm hoặc bạn đang thiếu trưởng thành cảm xúc." },
+            { id: "knight-of-cups", name: "Knight of Cups", emoji: "🏇🍷", reversedEmoji: "🏇🍷", keyword: "người lãng mạn, lời mời tình cảm", reversedKeyword: "lãng mạn giả tạo, lừa dối hoặc thất hứa",
+              meaning: "Người mang đến lời đề nghị lãng mạn hoặc cảm xúc.",
+              reversedMeaning: "Người này có thể không chân thành hoặc lời mời đang bị trì hoãn." },
+            { id: "queen-of-cups", name: "Queen of Cups", emoji: "👸🍷", reversedEmoji: "👸🍷", keyword: "trắc ẩn, trực giác và nuôi dưỡng", reversedKeyword: "trắc ẩn quá mức, phụ thuộc cảm xúc hoặc kiệt sức",
+              meaning: "Người phụ nữ nhạy cảm, giàu lòng trắc ẩn và trực giác mạnh.",
+              reversedMeaning: "Bạn đang cho đi quá nhiều và kiệt sức. Hãy đặt giới hạn." },
+            { id: "king-of-cups", name: "King of Cups", emoji: "👑🍷", reversedEmoji: "👑🍷", keyword: "trưởng thành cảm xúc, ngoại giao", reversedKeyword: "cảm xúc bất ổn, thao túng hoặc lạnh lùng",
+              meaning: "Người đàn ông chín chắn về cảm xúc, biết kiểm soát và hỗ trợ người khác.",
+              reversedMeaning: "Cảm xúc đang bất ổn hoặc ai đó đang thao túng bạn." },
+            // Gậy (Wands)
+            { id: "ace-of-wands", name: "Ace of Wands", emoji: "1️⃣🔥", reversedEmoji: "1️⃣🔥", keyword: "đam mê mới và năng lượng bùng nổ", reversedKeyword: "thiếu đam mê, trì hoãn hoặc năng lượng tiêu cực",
+              meaning: "Ngọn lửa sáng tạo bùng lên, cơ hội mới đầy hứa hẹn.",
+              reversedMeaning: "Đam mê đang bị dập tắt. Hãy tìm lại ngọn lửa nội tại." },
+            { id: "two-of-wands", name: "Two of Wands", emoji: "2️⃣🌍", reversedEmoji: "2️⃣🌍", keyword: "lập kế hoạch tương lai", reversedKeyword: "bất an tương lai, do dự hoặc thiếu tầm nhìn",
+              meaning: "Bạn đang ở ngã ba đường, cần quyết định hướng đi dài hạn.",
+              reversedMeaning: "Bạn đang do dự hoặc thiếu tầm nhìn dài hạn." },
+            { id: "three-of-wands", name: "Three of Wands", emoji: "3️⃣🚢", reversedEmoji: "3️⃣🚢", keyword: "tiến triển và mở rộng", reversedKeyword: "trì hoãn, cơ hội bị bỏ lỡ hoặc chờ đợi vô vọng",
+              meaning: "Công việc đang phát triển tốt, cơ hội đến từ xa.",
+              reversedMeaning: "Tiến triển đang bị chậm lại. Hãy kiên trì nhưng điều chỉnh kế hoạch." },
+            { id: "four-of-wands", name: "Four of Wands", emoji: "4️⃣🏠", reversedEmoji: "4️⃣🏠", keyword: "ổn định, ăn mừng và nhà cửa", reversedKeyword: "bất ổn nhà cửa, xung đột gia đình hoặc tạm thời",
+              meaning: "Hạnh phúc gia đình, lễ kỷ niệm hoặc không gian ấm cúng.",
+              reversedMeaning: "Có bất ổn trong nhà hoặc ăn mừng bị trì hoãn." },
+            { id: "five-of-wands", name: "Five of Wands", emoji: "5️⃣⚔️", reversedEmoji: "5️⃣⚔️", keyword: "cạnh tranh và xung đột nhỏ", reversedKeyword: "xung đột nghiêm trọng, tranh cãi hoặc kiệt sức",
+              meaning: "Có nhiều ý kiến khác nhau, tranh đua lành mạnh.",
+              reversedMeaning: "Xung đột đang leo thang. Hãy tìm cách hòa giải." },
+            { id: "six-of-wands", name: "Six of Wands", emoji: "6️⃣🏆", reversedEmoji: "6️⃣🏆", keyword: "chiến thắng và công nhận", reversedKeyword: "thất bại, thiếu công nhận hoặc kiêu ngạo",
+              meaning: "Bạn sẽ được công nhận, thành công công khai.",
+              reversedMeaning: "Chiến thắng đang bị trì hoãn hoặc bạn đang kiêu ngạo." },
+            { id: "seven-of-wands", name: "Seven of Wands", emoji: "7️⃣🛡️", reversedEmoji: "7️⃣🛡️", keyword: "bảo vệ thành quả và kiên cường", reversedKeyword: "kiệt sức, đầu hàng hoặc áp lực quá lớn",
+              meaning: "Bạn đang ở vị trí cao, cần đứng vững trước thử thách.",
+              reversedMeaning: "Áp lực quá lớn khiến bạn kiệt sức. Hãy tìm sự hỗ trợ." },
+            { id: "eight-of-wands", name: "Eight of Wands", emoji: "8️⃣☄️", reversedEmoji: "8️⃣☄️", keyword: "tốc độ nhanh chóng và tin tức", reversedKeyword: "chậm trễ, cản trở hoặc tin xấu",
+              meaning: "Mọi thứ diễn ra rất nhanh, cơ hội đến ồ ạt.",
+              reversedMeaning: "Có chậm trễ hoặc tin tức tiêu cực. Hãy kiên nhẫn." },
+            { id: "nine-of-wands", name: "Nine of Wands", emoji: "9️⃣🛡️", reversedEmoji: "9️⃣🛡️", keyword: "kiên cường sau thử thách", reversedKeyword: "kiệt sức hoàn toàn, phòng thủ quá mức",
+              meaning: "Bạn đã mệt mỏi nhưng vẫn đang cầm cự.",
+              reversedMeaning: "Bạn đang kiệt sức và cần nghỉ ngơi." },
+            { id: "ten-of-wands", name: "Ten of Wands", emoji: "🔟🏋️", reversedEmoji: "🔟🏋️", keyword: "gánh nặng quá tải", reversedKeyword: "buông bỏ gánh nặng, giải phóng",
+              meaning: "Bạn đang gánh quá nhiều trách nhiệm.",
+              reversedMeaning: "Đã đến lúc buông bỏ bớt. Hãy chia sẻ trách nhiệm." },
+            { id: "page-of-wands", name: "Page of Wands", emoji: "👦🔥", reversedEmoji: "👦🔥", keyword: "tin tức mới, nhiệt huyết trẻ", reversedKeyword: "tin xấu, thiếu nhiệt huyết hoặc trì hoãn",
+              meaning: "Ý tưởng mới mẻ hoặc một người trẻ đầy nhiệt huyết.",
+              reversedMeaning: "Có tin xấu hoặc thiếu nhiệt huyết." },
+            { id: "knight-of-wands", name: "Knight of Wands", emoji: "🏇🔥", reversedEmoji: "🏇🔥", keyword: "hành động nhanh, phiêu lưu", reversedKeyword: "vội vã, nóng vội hoặc thiếu cam kết",
+              meaning: "Người năng động, thích mạo hiểm.",
+              reversedMeaning: "Hành động đang quá vội vã hoặc thiếu cam kết." },
+            { id: "queen-of-wands", name: "Queen of Wands", emoji: "👸🔥", reversedEmoji: "👸🔥", keyword: "tự tin, quyến rũ và sáng tạo", reversedKeyword: "ghen tị, thiếu tự tin hoặc nóng nảy",
+              meaning: "Người phụ nữ mạnh mẽ, tự tin và đầy sức sống.",
+              reversedMeaning: "Bạn đang thiếu tự tin hoặc có ghen tị." },
+            { id: "king-of-wands", name: "King of Wands", emoji: "👑🔥", reversedEmoji: "👑🔥", keyword: "lãnh đạo đam mê và tầm nhìn", reversedKeyword: "độc đoán, thiếu tầm nhìn hoặc nóng nảy",
+              meaning: "Người đàn ông có tầm nhìn xa, truyền cảm hứng.",
+              reversedMeaning: "Lãnh đạo đang trở nên độc đoán." },
+            // Kiếm (Swords)
+            { id: "ace-of-swords", name: "Ace of Swords", emoji: "1️⃣🗡️", reversedEmoji: "1️⃣🗡️", keyword: "sự thật rõ ràng và đột phá trí tuệ", reversedKeyword: "lừa dối, hỗn loạn trí tuệ hoặc quyết định sai",
+              meaning: "Lời nói sắc bén, ý tưởng đột phá và sự thật được phơi bày.",
+              reversedMeaning: "Sự thật đang bị che giấu hoặc bạn đang đưa ra quyết định sai lầm." },
+            { id: "two-of-swords", name: "Two of Swords", emoji: "2️⃣⚔️", reversedEmoji: "2️⃣⚔️", keyword: "bế tắc và khó quyết định", reversedKeyword: "quyết định rõ ràng, tháo gỡ bế tắc",
+              meaning: "Bạn đang bịt mắt trước sự thật.",
+              reversedMeaning: "Bạn đã sẵn sàng đưa ra quyết định dứt khoát." },
+            { id: "three-of-swords", name: "Three of Swords", emoji: "3️⃣💔", reversedEmoji: "3️⃣💔", keyword: "nỗi đau xé lòng và chia ly", reversedKeyword: "chữa lành, tha thứ hoặc chấp nhận",
+              meaning: "Sự phản bội hoặc tổn thương sâu sắc.",
+              reversedMeaning: "Bạn đang bắt đầu chữa lành và tha thứ." },
+            { id: "four-of-swords", name: "Four of Swords", emoji: "4️⃣🛡️", reversedEmoji: "4️⃣🛡️", keyword: "nghỉ ngơi và phục hồi", reversedKeyword: "bất an, lo lắng hoặc không nghỉ ngơi được",
+              meaning: "Thời gian cần thiết để nghỉ ngơi và hồi phục.",
+              reversedMeaning: "Bạn không thể nghỉ ngơi vì lo lắng. Hãy tìm cách thư giãn." },
+            { id: "five-of-swords", name: "Five of Swords", emoji: "5️⃣🏳️", reversedEmoji: "5️⃣🏳️", keyword: "thắng thua và xung đột", reversedKeyword: "hòa giải, buông bỏ chiến thắng giả",
+              meaning: "Có thể thắng nhưng mất mát lớn về mối quan hệ.",
+              reversedMeaning: "Bạn đang học cách buông bỏ và hòa giải." },
+            { id: "six-of-swords", name: "Six of Swords", emoji: "6️⃣⛵", reversedEmoji: "6️⃣⛵", keyword: "chuyển tiếp và rời bỏ khó khăn", reversedKeyword: "bế tắc, không tiến được hoặc quay lại vấn đề",
+              meaning: "Bạn đang rời khỏi giai đoạn khó khăn.",
+              reversedMeaning: "Chuyển tiếp đang bị cản trở. Hãy kiên nhẫn." },
+            { id: "seven-of-swords", name: "Seven of Swords", emoji: "7️⃣🕵️", reversedEmoji: "7️⃣🕵️", keyword: "lừa dối hoặc chiến lược", reversedKeyword: "thành thật, lộ rõ hoặc tự phản bội",
+              meaning: "Có thể có sự gian lận hoặc bạn đang dùng chiến lược khôn ngoan.",
+              reversedMeaning: "Sự gian lận đang bị phơi bày hoặc bạn cần thành thật hơn." },
+            { id: "eight-of-swords", name: "Eight of Swords", emoji: "8️⃣🪢", reversedEmoji: "8️⃣🪢", keyword: "cảm giác bị kẹt và sợ hãi", reversedKeyword: "giải thoát, tự do hoặc nhìn rõ vấn đề",
+              meaning: "Bạn tự giam cầm mình bởi suy nghĩ tiêu cực.",
+              reversedMeaning: "Bạn đã tìm thấy cách tự giải thoát." },
+            { id: "nine-of-swords", name: "Nine of Swords", emoji: "9️⃣😱", reversedEmoji: "9️⃣😱", keyword: "lo âu và cơn ác mộng", reversedKeyword: "giảm lo âu, hy vọng hoặc tỉnh giấc",
+              meaning: "Nỗi sợ hãi trong tâm trí.",
+              reversedMeaning: "Lo âu đang giảm dần. Ánh sáng đang trở lại." },
+            { id: "ten-of-swords", name: "Ten of Swords", emoji: "🔟⚰️", reversedEmoji: "🔟⚰️", keyword: "kết thúc đau đớn và đáy vực", reversedKeyword: "tái sinh, phục hồi hoặc chấp nhận",
+              meaning: "Điểm thấp nhất, nhưng cũng là lúc mọi thứ chỉ có thể tốt lên.",
+              reversedMeaning: "Bạn đang bắt đầu phục hồi sau đáy vực." },
+            { id: "page-of-swords", name: "Page of Swords", emoji: "👦🗡️", reversedEmoji: "👦🗡️", keyword: "tin tức, tò mò và cảnh giác", reversedKeyword: "tin xấu, thiếu cảnh giác hoặc dối trá",
+              meaning: "Tin nhắn hoặc ý tưởng mới.",
+              reversedMeaning: "Có tin xấu hoặc thiếu cảnh giác." },
+            { id: "knight-of-swords", name: "Knight of Swords", emoji: "🏇🗡️", reversedEmoji: "🏇🗡️", keyword: "hành động nhanh, trí tuệ sắc bén", reversedKeyword: "vội vã, hung hăng hoặc thiếu suy nghĩ",
+              meaning: "Người quyết đoán, nói thẳng.",
+              reversedMeaning: "Hành động quá vội vã hoặc hung hăng." },
+            { id: "queen-of-swords", name: "Queen of Swords", emoji: "👸🗡️", reversedEmoji: "👸🗡️", keyword: "thông minh, độc lập và rõ ràng", reversedKeyword: "cay nghiệt, lạnh lùng hoặc bị tổn thương",
+              meaning: "Người phụ nữ sắc sảo, trung thực.",
+              reversedMeaning: "Bạn đang quá cay nghiệt hoặc bị tổn thương sâu." },
+            { id: "king-of-swords", name: "King of Swords", emoji: "👑🗡️", reversedEmoji: "👑🗡️", keyword: "lãnh đạo trí tuệ và công bằng", reversedKeyword: "độc đoán, thiếu nhân tính hoặc lạm quyền",
+              meaning: "Người có lý trí mạnh mẽ, công bằng.",
+              reversedMeaning: "Lãnh đạo đang thiếu nhân tính hoặc lạm quyền." },
+            // Tiền (Pentacles)
+            { id: "ace-of-pentacles", name: "Ace of Pentacles", emoji: "1️⃣🪙", reversedEmoji: "1️⃣🪙", keyword: "cơ hội tài chính và nền tảng mới", reversedKeyword: "cơ hội bị bỏ lỡ, mất mát tài chính",
+              meaning: "Cơ hội vàng về tiền bạc, công việc hoặc sức khỏe.",
+              reversedMeaning: "Cơ hội đang bị bỏ lỡ hoặc có mất mát tài chính." },
+            { id: "two-of-pentacles", name: "Two of Pentacles", emoji: "2️⃣⚖️", reversedEmoji: "2️⃣⚖️", keyword: "cân bằng nhiều việc", reversedKeyword: "mất cân bằng, quá tải hoặc rối loạn",
+              meaning: "Bạn đang xoay sở nhiều trách nhiệm.",
+              reversedMeaning: "Bạn đang quá tải và mất cân bằng." },
+            { id: "three-of-pentacles", name: "Three of Pentacles", emoji: "3️⃣🏗️", reversedEmoji: "3️⃣🏗️", keyword: "làm việc nhóm và kỹ năng", reversedKeyword: "thiếu hợp tác, kỹ năng kém hoặc trì hoãn",
+              meaning: "Thành công nhờ hợp tác và chuyên môn.",
+              reversedMeaning: "Có vấn đề trong làm việc nhóm hoặc kỹ năng chưa đủ." },
+            { id: "four-of-pentacles", name: "Four of Pentacles", emoji: "4️⃣🪙", reversedEmoji: "4️⃣🪙", keyword: "giữ chặt và sợ mất", reversedKeyword: "buông bỏ, chia sẻ hoặc mất mát",
+              meaning: "Bạn đang nắm giữ quá chặt tiền bạc hoặc an toàn.",
+              reversedMeaning: "Đã đến lúc buông bỏ và chia sẻ." },
+            { id: "five-of-pentacles", name: "Five of Pentacles", emoji: "5️⃣❄️", reversedEmoji: "5️⃣❄️", keyword: "thiếu thốn và cô lập", reversedKeyword: "hỗ trợ đến, chữa lành hoặc cải thiện",
+              meaning: "Khó khăn tài chính hoặc cảm giác bị bỏ rơi.",
+              reversedMeaning: "Sự giúp đỡ đang đến. Bạn không còn cô đơn." },
+            { id: "six-of-pentacles", name: "Six of Pentacles", emoji: "6️⃣🤲", reversedEmoji: "6️⃣🤲", keyword: "cho và nhận cân bằng", reversedKeyword: "bất công, tham lam hoặc mất cân bằng",
+              meaning: "Sự chia sẻ, từ thiện hoặc nhận được sự hỗ trợ.",
+              reversedMeaning: "Có sự bất công trong việc cho và nhận." },
+            { id: "seven-of-pentacles", name: "Seven of Pentacles", emoji: "7️⃣🌱", reversedEmoji: "7️⃣🌱", keyword: "kiên nhẫn chờ đợi thành quả", reversedKeyword: "thiếu kiên nhẫn, thất vọng hoặc thu hoạch kém",
+              meaning: "Bạn đã gieo trồng, giờ là lúc chờ đợi.",
+              reversedMeaning: "Bạn đang thiếu kiên nhẫn hoặc thành quả kém hơn mong đợi." },
+            { id: "eight-of-pentacles", name: "Eight of Pentacles", emoji: "8️⃣🔨", reversedEmoji: "8️⃣🔨", keyword: "luyện tập và hoàn thiện kỹ năng", reversedKeyword: "thiếu tập trung, lười biếng hoặc kiệt sức",
+              meaning: "Thời gian học hỏi, rèn luyện và làm việc chăm chỉ.",
+              reversedMeaning: "Bạn đang thiếu tập trung hoặc kiệt sức với công việc." },
+            { id: "nine-of-pentacles", name: "Nine of Pentacles", emoji: "9️⃣🌳", reversedEmoji: "9️⃣🌳", keyword: "thành công độc lập và sung túc", reversedKeyword: "cô lập, mất mát tài chính hoặc phụ thuộc",
+              meaning: "Bạn đã đạt được sự độc lập tài chính.",
+              reversedMeaning: "Thành công đang bị che khuất hoặc bạn cảm thấy cô lập." },
+            { id: "ten-of-pentacles", name: "Ten of Pentacles", emoji: "🔟🏰", reversedEmoji: "🔟🏰", keyword: "thịnh vượng lâu dài và di sản", reversedKeyword: "mất mát tài chính gia đình, xung đột di sản",
+              meaning: "Thành tựu tài chính bền vững, gia đình hạnh phúc.",
+              reversedMeaning: "Có xung đột về di sản hoặc mất mát tài chính gia đình." },
+            { id: "page-of-pentacles", name: "Page of Pentacles", emoji: "👦🪙", reversedEmoji: "👦🪙", keyword: "cơ hội học hỏi và kế hoạch", reversedKeyword: "thiếu tập trung, cơ hội bị bỏ lỡ",
+              meaning: "Tin tức về công việc hoặc ý tưởng thực tế mới.",
+              reversedMeaning: "Cơ hội học hỏi đang bị bỏ lỡ." },
+            { id: "knight-of-pentacles", name: "Knight of Pentacles", emoji: "🏇🪙", reversedEmoji: "🏇🪙", keyword: "chăm chỉ, đáng tin cậy", reversedKeyword: "lười biếng, thiếu tiến triển hoặc cứng nhắc",
+              meaning: "Người làm việc cần cù, kiên trì.",
+              reversedMeaning: "Bạn đang thiếu tiến triển hoặc quá cứng nhắc." },
+            { id: "queen-of-pentacles", name: "Queen of Pentacles", emoji: "👸🪙", reversedEmoji: "👸🪙", keyword: "chăm sóc thực tế và thịnh vượng", reversedKeyword: "bỏ bê, tham lam hoặc thiếu cân bằng",
+              meaning: "Người phụ nữ thực tế, chu đáo và thành công.",
+              reversedMeaning: "Bạn đang bỏ bê bản thân hoặc thiếu cân bằng." },
+            { id: "king-of-pentacles", name: "King of Pentacles", emoji: "👑🪙", reversedEmoji: "👑🪙", keyword: "thành công vật chất và ổn định", reversedKeyword: "tham lam, bất ổn tài chính hoặc lạm dụng quyền lực",
+              meaning: "Người đàn ông thành đạt, đáng tin cậy.",
+              reversedMeaning: "Thành công đang bị đe dọa bởi tham lam hoặc bất ổn." }
+        ];
+
+
+const contextualMeanings = {
+    "ace-of-pentacles": {
+        love: { upright: "Một cơ hội tình cảm rất thực tế và bền vững đang đến – mối quan hệ mang lại sự ổn định, an toàn và phát triển lâu dài.", reversed: "Cơ hội tình cảm bị bỏ lỡ hoặc mối quan hệ thiếu nền tảng vững chắc." },
+        career: { upright: "Cơ hội vàng về tiền bạc, công việc hoặc sức khỏe.", reversed: "Cơ hội bị bỏ lỡ hoặc mất mát tài chính." },
+        journey: { upright: "Bước khởi đầu mới về vật chất và tinh thần.", reversed: "Cần chú ý đến nền tảng thực tế." }
+    },
+    "three-of-pentacles": {
+        love: { upright: "Hai bạn đang cùng xây dựng mối quan hệ một cách có hệ thống, học hỏi lẫn nhau và tạo nền tảng lâu dài.", reversed: "Mối quan hệ thiếu sự phối hợp, một bên không muốn đầu tư công sức chung." },
+        career: { upright: "Thành công nhờ hợp tác nhóm và kỹ năng chuyên môn.", reversed: "Thiếu hợp tác hoặc kỹ năng chưa đủ." },
+        journey: { upright: "Bạn đang hoàn thiện bản thân qua sự hợp tác với người khác.", reversed: "Cần tự lập hơn." }
+    },
+    "four-of-pentacles": {
+        love: { upright: "Bạn đang muốn giữ chặt mối quan hệ, sợ mất. Cần cân bằng giữa an toàn và mở lòng.", reversed: "Bạn hoặc đối phương đang kiểm soát, keo kiệt tình cảm hoặc sợ cam kết sâu." },
+        career: { upright: "Giữ chặt tài chính và an toàn.", reversed: "Đã đến lúc buông bỏ và chia sẻ." },
+        journey: { upright: "Giữ gìn năng lượng nội tại.", reversed: "Cần buông bỏ để tiến bước." }
+    },
+    "five-of-pentacles": {
+        love: { upright: "Cảm giác cô đơn hoặc thiếu thốn trong tình cảm dù đang bên nhau.", reversed: "Sự giúp đỡ và chữa lành tình cảm đang đến." },
+        career: { upright: "Khó khăn tài chính hoặc cảm giác bị bỏ rơi.", reversed: "Sự giúp đỡ đang đến." },
+        journey: { upright: "Giai đoạn thử thách vật chất.", reversed: "Bạn không cô đơn trên hành trình." }
+    },
+    "nine-of-pentacles": {
+        love: { upright: "Tình yêu độc lập, tự do và sung túc. Bạn hạnh phúc với chính mình trước khi bước vào tình yêu.", reversed: "Cô lập hoặc phụ thuộc trong tình cảm." },
+        career: { upright: "Thành công độc lập và sung túc.", reversed: "Cô lập hoặc mất mát tài chính." },
+        journey: { upright: "Đạt được sự tự do nội tại.", reversed: "Cần cân bằng." }
+    },
+    "ten-of-pentacles": {
+        love: { upright: "Hạnh phúc gia đình lâu dài, ổn định và di sản tình cảm.", reversed: "Xung đột gia đình hoặc tan vỡ di sản tình cảm." },
+        career: { upright: "Thịnh vượng lâu dài và di sản.", reversed: "Mất mát tài chính gia đình." },
+        journey: { upright: "Hoàn thành chu kỳ thịnh vượng.", reversed: "Cần chữa lành di sản." }
+    },
+    "knight-of-pentacles": {
+        love: { upright: "Người chín chắn, đáng tin cậy, yêu chậm nhưng chắc chắn và cam kết lâu dài.", reversed: "Cứng nhắc, thiếu tiến triển hoặc nhàm chán trong tình cảm." },
+        career: { upright: "Chăm chỉ, đáng tin cậy.", reversed: "Lười biếng hoặc cứng nhắc." },
+        journey: { upright: "Tiến bộ chậm nhưng vững chắc.", reversed: "Cần linh hoạt hơn." }
+    },
+    "queen-of-pentacles": {
+        love: { upright: "Người phụ nữ chu đáo, thực tế, nuôi dưỡng tình yêu bằng hành động cụ thể.", reversed: "Bỏ bê bản thân hoặc tham lam tình cảm." },
+        career: { upright: "Chăm sóc thực tế và thịnh vượng.", reversed: "Bỏ bê hoặc thiếu cân bằng." },
+        journey: { upright: "Nuôi dưỡng bản thân trên hành trình.", reversed: "Cần tự chăm sóc." }
+    },
+    "king-of-pentacles": {
+        love: { upright: "Người đàn ông thành đạt, ổn định, mang lại cảm giác an toàn tuyệt đối trong tình yêu.", reversed: "Tham lam hoặc bất ổn tài chính ảnh hưởng đến tình cảm." },
+        career: { upright: "Thành công vật chất và ổn định.", reversed: "Tham lam hoặc bất ổn." },
+        journey: { upright: "Đạt được sự ổn định nội tại.", reversed: "Cần cân bằng vật chất - tinh thần." }
+    },
+    "three-of-swords": {
+        love: { upright: "Nỗi đau xé lòng, phản bội hoặc chia tay trong tình cảm.", reversed: "Chữa lành và tha thứ sau tổn thương tình cảm." },
+        career: { upright: "Nỗi đau xé lòng.", reversed: "Chữa lành." },
+        journey: { upright: "Bài học từ nỗi đau.", reversed: "Tha thứ và tiến bước." }
+    },
+    "ten-of-swords": {
+        love: { upright: "Kết thúc đau đớn của một mối quan hệ (chia tay, kiệt sức cảm xúc). Đây là đáy vực.", reversed: "Bạn đang bắt đầu hồi phục sau tổn thương tình cảm." },
+        career: { upright: "Kết thúc đau đớn và đáy vực.", reversed: "Tái sinh." },
+        journey: { upright: "Kết thúc một chu kỳ đau thương.", reversed: "Phục hồi." }
+    },
+    "eight-of-swords": {
+        love: { upright: "Cảm giác bị kẹt trong mối quan hệ, tự giam cầm mình bởi sợ hãi.", reversed: "Giải thoát khỏi mối quan hệ độc hại hoặc suy nghĩ tiêu cực." },
+        career: { upright: "Cảm giác bị kẹt.", reversed: "Tự do." },
+        journey: { upright: "Tự giam cầm bởi suy nghĩ.", reversed: "Giải thoát." }
+    },
+    "seven-of-wands": {
+        love: { upright: "Bạn phải đứng lên bảo vệ mối quan hệ trước áp lực từ bên ngoài.", reversed: "Kiệt sức vì phải chiến đấu liên tục trong tình yêu." },
+        career: { upright: "Bảo vệ thành quả.", reversed: "Kiệt sức." },
+        journey: { upright: "Kiên cường trước thử thách.", reversed: "Cần nghỉ ngơi." }
+    },
+    "the-tower": {
+        love: { upright: "Sụp đổ đột ngột của mối quan hệ cũ để xây dựng lại chân thành hơn.", reversed: "Khủng hoảng kéo dài trong tình cảm." },
+        career: { upright: "Sụp đổ đột ngột.", reversed: "Tránh né sụp đổ." },
+        journey: { upright: "Phá hủy để tái sinh.", reversed: "Kháng cự thay đổi." }
+    },
+    "death": {
+        love: { upright: "Kết thúc một giai đoạn tình cảm để nhường chỗ cho tình yêu mới sâu sắc hơn.", reversed: "Kháng cự thay đổi trong mối quan hệ." },
+        career: { upright: "Kết thúc và chuyển hóa.", reversed: "Kháng cự thay đổi." },
+        journey: { upright: "Chuyển hóa linh hồn.", reversed: "Sợ thay đổi." }
+    }
+    // Bạn có thể thêm nhiều lá khác vào đây sau nếu muốn
+};
+
+        // ====================== TẦNG Ý NGHĨA (ĐÃ BỔ SUNG ) ======================
+       const interpretationLayers = {
+            general: [
+                "Vũ trụ đang thì thầm rằng bạn đang đứng trước ngưỡng cửa của một sự chuyển mình lớn lao.",
+                "Năng lượng của lá này đang kết nối trực tiếp với linh hồn bạn, khơi dậy sức mạnh tiềm ẩn từ kiếp trước.",
+                "Đây là lời mời gọi từ vũ trụ để bạn nhìn sâu vào chính mình.",
+                "Tầng tâm linh: Lá bài đang mở ra dòng chảy năng lượng cao hơn.",
+                "Bóng tối ẩn: Có một bài học sâu sắc đang chờ bạn đối diện.",
+                "Tầng vũ trụ: Các vì sao đang sắp xếp để bạn nhận được món quà định mệnh.",
+                "Lời nhắc nhở từ tổ tiên: Bạn không bao giờ cô đơn trong hành trình này.",
+                "Năng lượng hiện tại: Lá bài đang hòa quyện với chu kỳ mặt trăng hôm nay.",
+                "Tầng tiềm thức: Điều bạn cảm nhận sâu thẳm chính là chìa khóa.",
+                "Thông điệp dài hạn: Hành động hôm nay sẽ tạo nên di sản tương lai.",
+                "Đây là tín hiệu từ vũ trụ rằng bạn đang được hỗ trợ mạnh mẽ.",
+                "Lá bài mang năng lượng chữa lành từ sâu bên trong linh hồn."
+            ],
+            love: [
+                "Tình yêu lúc này là bài học về sự chân thành và dũng cảm buông bỏ lớp vỏ bảo vệ.",
+                "Vũ trụ đang sắp xếp một mối liên kết định mệnh.",
+                "Tầng cảm xúc sâu: Lá bài nhắc bạn chữa lành vết thương cũ.",
+                "Nhánh phụ – Thử thách: Nếu bạn né tránh, mối quan hệ có thể lặp lại vết xe đổ.",
+                "Nhánh phụ – Tiềm năng: Khi bạn sẵn sàng, đây sẽ là mối tình mang lại chữa lành và trưởng thành.",
+                "Tầng định mệnh: Hai linh hồn đang được kéo lại gần nhau qua lá bài này.",
+                "Cảnh báo tình cảm: Hãy lắng nghe trực giác thay vì lý trí.",
+                "Tiềm năng đẹp: Tình yêu này có thể trở thành bài học lớn nhất của kiếp này.",
+                "Lời khuyên từ vũ trụ: Hãy mở lòng để nhận lấy tình yêu xứng đáng.",
+                "Nhánh ẩn: Sự chân thành sẽ mở ra cánh cửa mà bạn chưa từng tưởng tượng.",
+                "Trong tình yêu, lá bài nhấn mạnh nhu cầu kết nối sâu sắc và chân thành.",
+                "Vũ trụ nhắc nhở bạn về sự cân bằng cảm xúc trong mối quan hệ.",
+                "Đây là cơ hội chữa lành vết thương tình cảm cũ và mở ra tình yêu mới mẻ.",
+                "Tình yêu lúc này đòi hỏi bạn dũng cảm thể hiện cảm xúc thật sự.",
+                "Mối quan hệ đang ở giai đoạn cần sự tin tưởng và buông bỏ kiểm soát.",
+                "Lá bài mang thông điệp về sự gắn kết linh hồn và chữa lành đôi lứa.",
+                "Tình cảm hiện tại đang được vũ trụ hỗ trợ để phát triển sâu sắc hơn.",
+                "Đây là lúc để bạn đón nhận tình yêu đích thực từ trái tim."
+            ],
+            career: [
+                "Sự nghiệp đang ở giai đoạn vũ trụ thử thách bạn.",
+                "Tầng chiến lược sâu: Lá bài đang vẽ nên con đường thành công dài hạn.",
+                "Nhánh phụ – Cơ hội ẩn: Một cánh cửa bất ngờ sẽ mở ra.",
+                "Nhánh phụ – Cảnh báo: Tránh tham lam hoặc sợ hãi.",
+                "Nhánh phụ – Thành tựu: Khi bạn kiên trì, vũ trụ sẽ thưởng cho bạn.",
+                "Tầng tài chính: Năng lượng tiền bạc đang chảy về phía bạn.",
+                "Lời khuyên nghề nghiệp: Hãy tin vào trực giác khi đưa ra quyết định lớn.",
+                "Chu kỳ phát triển: Đây là lúc bạn thu hoạch thành quả từ những gì đã gieo.",
+                "Cảnh báo: Tránh hành động vội vã, hãy xây dựng nền tảng vững chắc.",
+                "Tiềm năng: Bạn đang được chọn để dẫn dắt và truyền cảm hứng cho người khác.",
+                "Trong sự nghiệp, lá bài thúc đẩy bạn tập trung phát triển kỹ năng cá nhân.",
+                "Đây là lúc nắm bắt cơ hội thăng tiến và xây dựng nền tảng vững chắc.",
+                "Vũ trụ hỗ trợ bạn vượt qua thử thách nghề nghiệp với sự kiên trì.",
+                "Lá bài khuyên nên hợp tác hiệu quả để đạt mục tiêu công việc.",
+                "Đây là dấu hiệu chuyển biến tích cực trong con đường sự nghiệp.",
+                "Bạn đang được dẫn dắt đến vị trí xứng đáng với nỗ lực của mình.",
+                "Thời điểm lý tưởng để thể hiện tài năng và nhận được công nhận."
+            ],
+            journey: [
+                "Hành trình linh hồn của bạn đang tiến vào chu kỳ mới đầy biến đổi.",
+                "Tầng chuyển hóa: Mọi thứ bạn trải qua đều là bài học cần thiết.",
+                "Nhánh phụ – Quá khứ: Những tổn thương cũ đang được giải phóng.",
+                "Nhánh phụ – Tương lai: Vũ trụ đang chuẩn bị cho bạn kết quả đẹp đẽ.",
+                "Nhánh phụ – Bài học: Sự kiên nhẫn và tin tưởng là chìa khóa.",
+                "Tầng tái sinh: Bạn đang lột xác thành phiên bản cao hơn của chính mình.",
+                "Năng lượng kiếp trước: Bài học này bạn đã mang theo từ nhiều kiếp.",
+                "Lời mời gọi: Hãy để vũ trụ dẫn dắt thay vì cố kiểm soát mọi thứ.",
+                "Cảnh báo: Tránh kháng cự thay đổi – nó sẽ mang lại bình an sâu sắc.",
+                "Tiềm năng cuối cùng: Hành trình này sẽ đưa bạn đến sự toàn vẹn tâm hồn.",
+                "Trên hành trình linh hồn, lá bài đánh dấu một bước chuyển mình quan trọng.",
+                "Bạn đang được dẫn dắt qua bài học sâu sắc để đạt trưởng thành nội tâm.",
+                "Đây là giai đoạn buông bỏ quá khứ và đón nhận năng lượng mới.",
+                "Hành trình của bạn đang đồng bộ với dòng chảy vũ trụ.",
+                "Lá này nhắc nhở mọi thử thách đều là cơ hội để bạn lột xác.",
+                "Bạn đang bước vào giai đoạn tái sinh mạnh mẽ của linh hồn."
+            ],
+            clarifier: [
+                "Lá phụ này làm sáng tỏ tầng cảm xúc mà lá chính chưa thể hiện hết.",
+                "Đây là lời nhắc nhở từ vũ trụ rằng bạn cần chú ý đến khía cạnh bị che khuất.",
+                "Nhánh phụ của lá phụ: Nó mang đến góc nhìn mới, giúp bạn thấy rõ con đường phía trước.",
+                "Tiềm năng ẩn của lá phụ: Nếu bạn hành động theo nó, kết quả sẽ vượt xa mong đợi.",
+                "Cảnh báo từ lá phụ: Đừng bỏ qua dấu hiệu nhỏ này – nó là chìa khóa giải quyết vấn đề.",
+                "Liên kết sâu: Lá phụ đang bổ sung chính xác điều lá chính đang kêu gọi.",
+                "Tầng đồng bộ: Hai lá tạo thành một cặp hoàn hảo, không thể tách rời.",
+                "Thông điệp bổ trợ: Lá phụ mang năng lượng chữa lành hoặc cảnh tỉnh mạnh mẽ.",
+                "Góc nhìn mới: Nhờ lá phụ, bạn sẽ thấy rõ bức tranh toàn diện hơn.",
+                "Hành động ngay: Lá phụ đang thúc giục bạn thực hiện bước tiếp theo.",
+                "Lá phụ xác nhận và mở rộng thông điệp của lá chính một cách sâu sắc.",
+                "Hai lá này tạo nên sự hài hòa hoàn hảo giữa vấn đề và giải pháp."
+            ]
+        };
+
+        const spreadTypes = {
+            love: { id: 'love', name: 'Tình Yêu', positions: [{ title: "1. Bạn", desc: "Cảm xúc & thái độ hiện tại của bạn." }, { title: "2. Người Ấy", desc: "Góc nhìn & năng lượng của đối phương." }, { title: "3. Tương Lai", desc: "Tiềm năng của mối quan hệ này." }] },
+            career: { id: 'career', name: 'Sự Nghiệp', positions: [{ title: "1. Hiện Tại", desc: "Tình trạng công việc/tài chính lúc này." }, { title: "2. Cơ Hội", desc: "Điểm mạnh hoặc yếu tố thuận lợi." }, { title: "3. Rủi Ro", desc: "Thử thách tiềm ẩn cần đề phòng." }, { title: "4. Lời Khuyên", desc: "Hành động cụ thể bạn nên làm." }] },
+            journey: { id: 'journey', name: 'Hành Trình', positions: [{ title: "1. Quá Khứ", desc: "Nền tảng đã qua." }, { title: "2. Hiện Tại", desc: "Trọng tâm lúc này." }, { title: "3. Thử Thách", desc: "Điều cản bước." }, { title: "4. Lời Khuyên", desc: "Cách giải quyết." }, { title: "5. Kết Quả", desc: "Hướng đi tương lai." }] }
+        };
+
+        let currentSpreadType = 'love';
+        let currentCards = [];
+        let clarifierCards = {};
+        let flippedCount = 0;
+        let deckCopy = [];
+        let currentUserName = 'Người trải bài';
+        let currentQuestion = 'Trải bài hôm nay';
+        let readingHistory = JSON.parse(localStorage.getItem('tarotHistory') || '[]');
+        let canvas, ctx, particles = [];
+
+        function createParticles() {
+            canvas = document.getElementById('particleCanvas');
+            ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            for (let i = 0; i < 80; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 3 + 1,
+                    speed: Math.random() * 2.5 + 0.8
+                });
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#d4af37';
+            particles.forEach(p => {
+                ctx.globalAlpha = Math.random() * 0.8 + 0.2;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+                p.y += p.speed;
+                if (p.y > canvas.height) p.y = 0;
+            });
+            ctx.globalAlpha = 1;
+        }
+
+        function setSpreadType(type) {
+            currentSpreadType = type;
+            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = Array.from(document.querySelectorAll('.menu-btn')).find(btn => btn.getAttribute('onclick').includes(`'${type}'`));
+            if (activeBtn) activeBtn.classList.add('active');
+            document.getElementById('spreadContainer').innerHTML = '';
+            document.getElementById('readingPanel').classList.remove('show');
+            document.getElementById('startBtn').innerText = "BẮT ĐẦU XÁO BÀI";
+        }
+
+        function shuffleDeck() {
+            deckCopy = [...deck];
+            for (let i = deckCopy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deckCopy[i], deckCopy[j]] = [deckCopy[j], deckCopy[i]];
+            }
+        }
+
+        function startSpread() {
+            const container = document.getElementById('spreadContainer');
+            const panel = document.getElementById('readingPanel');
+           
+            container.innerHTML = '';
+            document.getElementById('detailsContainer').innerHTML = '';
+            document.getElementById('summaryBox').style.display = 'none';
+            document.getElementById('summaryBtn').style.display = 'none';
+            panel.classList.remove('show');
+           
+            flippedCount = 0;
+            clarifierCards = {};
+            shuffleDeck();
+           
+            const spreadConf = spreadTypes[currentSpreadType];
+            currentCards = deckCopy.splice(0, spreadConf.positions.length).map(card => ({
+                ...card,
+                isReversed: Math.random() < 0.5
+            }));
+            container.classList.add('shuffling');
+            createParticles();
+            const particleInterval = setInterval(drawParticles, 30);
+            currentCards.forEach((card, index) => {
+                const emojiToUse = card.isReversed ? card.reversedEmoji : card.emoji;
+                const html = `
+                    <div class="card-wrapper" id="wrapper-${index}" style="animation-delay: ${index * 90}ms;">
+                        <div class="position-label">${spreadConf.positions[index].title}<br><span style="font-size:0.75rem; color:#aaa; font-weight:normal;">${spreadConf.positions[index].desc}</span></div>
+                        <div class="card-container">
+                            <div class="tarot-card ${card.isReversed ? 'reversed' : ''}" id="card-${index}" onclick="flipMainCard(${index})">
+                                <div class="card-face card-back"></div>
+                                <div class="card-face card-front">
+                                    <div class="card-emoji">${emojiToUse}</div>
+                                    <div class="card-name">${card.name} ${card.isReversed ? '<span style="color:#ff6b6b; font-size:0.8rem;">(Ngược)</span>' : ''}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="clarify-btn" id="clarifyBtn-${index}" onclick="drawClarifier(${index})" style="display:none;">+ Rút Lá Phụ</button>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+            setTimeout(() => {
+                container.classList.remove('shuffling');
+                clearInterval(particleInterval);
+                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+            }, 1400);
+            document.getElementById('startBtn').innerText = "XÁO BÀI LẠI";
+        }
+
+        function flipMainCard(index) {
+            const cardEl = document.getElementById(`card-${index}`);
+            if (cardEl.classList.contains('flipped')) return;
+            cardEl.classList.add('flipped');
+            flippedCount++;
+            setTimeout(() => {
+                const btn = document.getElementById(`clarifyBtn-${index}`);
+                if (btn) btn.style.display = 'block';
+            }, 600);
+            renderDetails();
+            if (flippedCount === currentCards.length) {
+                document.getElementById('readingPanel').classList.add('show');
+                document.getElementById('summaryBtn').style.display = 'inline-block';
+            }
+        }
+
+        function drawClarifier(index) {
+            document.getElementById(`clarifyBtn-${index}`).style.display = 'none';
+           
+            let extraCard = deckCopy.shift();
+            extraCard = { ...extraCard, isReversed: Math.random() < 0.5 };
+            clarifierCards[index] = extraCard;
+            const wrapper = document.getElementById(`wrapper-${index}`);
+            const emojiToUse = extraCard.isReversed ? extraCard.reversedEmoji : extraCard.emoji;
+            const extraHTML = `
+                <div class="clarifier-card" id="clar-wrapper-${index}">
+                    <div class="clarifier-inner">
+                        <div class="clarifier-tarot" id="clar-tarot-${index}">
+                            <div class="clarifier-face clarifier-back"></div>
+                            <div class="clarifier-face clarifier-front">
+                                <div class="clarifier-emoji">${emojiToUse}</div>
+                                <div class="clarifier-name">
+                                    ${extraCard.name}
+                                    ${extraCard.isReversed ? '<span style="color:#ff6b6b; font-size:0.78rem;">(Ngược)</span>' : ''}
+                                </div>
+                                <div class="clarifier-label"> Lá phụ </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+           
+            wrapper.innerHTML += extraHTML;
+            const clarCard = document.getElementById(`clar-wrapper-${index}`);
+            if (extraCard.isReversed) clarCard.classList.add('reversed');
+            clarCard.classList.add('anim-in');
+            setTimeout(() => {
+                const clarTarot = document.getElementById(`clar-tarot-${index}`);
+                if (clarTarot) clarTarot.classList.add('flipped');
+            }, 950);
+            renderDetails();
+            if (document.getElementById('summaryBox').style.display === 'block') generateSummary();
+        }
+function getContextualMeaning(card, spreadType, isReversed) {
+    const key = isReversed ? 'reversed' : 'upright';
+    const context = contextualMeanings[card.id];
+    if (context && context[spreadType] && context[spreadType][key]) {
+        return context[spreadType][key];
+    }
+    return isReversed ? card.reversedMeaning : card.meaning;
+}
+      function getLayeredAnalysis(card, spreadType) {
+    const isRev = card.isReversed;
+    const meaning = getContextualMeaning(card, spreadType, isRev);
+    const key = isRev ? card.reversedKeyword : card.keyword;
+
+    const g1 = interpretationLayers.general[Math.floor(Math.random() * interpretationLayers.general.length)];
+    const g2 = interpretationLayers.general[Math.floor(Math.random() * interpretationLayers.general.length)];
+    const s1 = interpretationLayers[spreadType][Math.floor(Math.random() * interpretationLayers[spreadType].length)];
+
+    let contextualText = '';
+    if (spreadType === 'love') contextualText = `Trong <strong>tình yêu</strong>, `;
+    else if (spreadType === 'career') contextualText = `Trong <strong>sự nghiệp</strong>, `;
+    else if (spreadType === 'journey') contextualText = `Trên <strong>hành trình linh hồn</strong>, `;
+
+    return `
+        ${meaning}<br><br>
+        <span style="color:#e0d4ff;">${contextualText}lá ${card.name} mang thông điệp sâu về <strong>${key}</strong>.</span>
+        <div class="layer-box">
+            <span class="layer-title">🔮 Phân Tích Tầng Lớp Ý Nghĩa Đa Chiều</span>
+            <p><strong>Tầng Tổng Quát Từ Vũ Trụ:</strong> ${g1}</p>
+            <p><strong>Tầng 2 – Năng Lượng Tiềm Thức:</strong> ${g2}</p>
+            <p><strong>Tầng Chính Theo Trải Bài ${isRev ? '(Ngược)' : ''}:</strong> ${s1}</p>
+            <p style="font-style:italic; color:#d4af37; margin-top:12px;">Tất cả các tầng này hòa quyện chặt chẽ, tạo nên thông điệp hoàn chỉnh dành riêng cho bạn.</p>
+        </div>`;
+}
+    function getClarifierLayeredAnalysis(mainCard, clarCard, spreadType) {
+    const mainMeaning = getContextualMeaning(mainCard, spreadType, mainCard.isReversed);
+    const clarMeaning = getContextualMeaning(clarCard, spreadType, clarCard.isReversed);
+
+    const combineTemplates = [
+        `Lá chính ${mainCard.name} cho thấy ${mainMeaning}. Khi kết hợp với lá phụ ${clarCard.name}, thông điệp trở nên hoàn chỉnh hơn: ${clarMeaning}.`,
+        `Từ lá chính ${mainCard.name}, vũ trụ đang nói ${mainMeaning}. Lá phụ ${clarCard.name} bổ trợ bằng ${clarMeaning}.`,
+        `Hai lá ${mainCard.name} và ${clarCard.name} kết hợp tạo ra thông điệp mạnh mẽ: từ ${mainMeaning} dẫn đến ${clarMeaning}.`
+    ];
+
+    const randomCombine = combineTemplates[Math.floor(Math.random() * combineTemplates.length)];
+
+    return `
+        <div class="clarifier-text">
+            ↳ <b>Lá phụ: ${clarCard.name} ${clarCard.isReversed ? '(Ngược)' : ''}</b><br>
+            ${clarMeaning}
+        </div>
+        <div class="layer-box">
+            <span class="layer-title">🔗 Ý NGHĨA KẾT HỢP CỦA HAI LÁ</span>
+            <p>${randomCombine}</p>
+        </div>`;
+}
+function renderDetails() {
+    const container = document.getElementById('detailsContainer');
+    container.innerHTML = '';
+    const spreadConf = spreadTypes[currentSpreadType];
+   
+    currentCards.forEach((card, index) => {
+        const cardEl = document.getElementById(`card-${index}`);
+        if (cardEl && cardEl.classList.contains('flipped')) {
+            const pos = spreadConf.positions[index];
+            let html = `
+                <div class="detail-box">
+                    <div class="detail-title">${pos.title}: <span>${card.name} ${card.isReversed ? '(Ngược)' : ''}</span></div>
+                    ${getLayeredAnalysis(card, currentSpreadType)}
+            `;
+            if (clarifierCards[index]) {
+                html += getClarifierLayeredAnalysis(card, clarifierCards[index], currentSpreadType);
+            }
+            html += `</div>`;
+            container.innerHTML += html;
+        }
+    });
+}
+
+        function generateSummary() {
+            const spreadConf = spreadTypes[currentSpreadType];
+            let summaryHTML = `<p style="font-size:1.2rem; line-height:1.85; margin-bottom:25px; color:#e0d4ff;">Vũ trụ vừa mở ra một câu chuyện hoàn chỉnh, đa tầng và mang tính định mệnh dành riêng cho bạn qua trải bài <strong>${spreadConf.name}</strong>. Đây là cuộc trò chuyện thiêng liêng giữa linh hồn bạn và vũ trụ.</p>`;
+            let narrative = currentCards.map((card, index) => {
+                const pos = spreadConf.positions[index];
+                return `<strong>${pos.title}</strong>: ${card.name} (${card.isReversed ? card.reversedKeyword : card.keyword})`;
+            }).join(' → ');
+            summaryHTML += `<p style="margin-bottom: 25px; padding: 18px; background: rgba(0,0,0,0.25); border-radius: 12px; border: 1px dashed var(--gold); font-size: 1.05rem;">${narrative}</p>`;
+            currentCards.forEach((card, index) => {
+                const pos = spreadConf.positions[index];
+                summaryHTML += `
+                    <div style="margin-bottom: 28px; padding: 18px; background: rgba(0,0,0,0.2); border-radius: 10px; border-left: 5px solid var(--gold);">
+                        <strong style="color:var(--gold); font-size:1.15rem;">${pos.title} – ${card.name} ${card.isReversed ? '(Ngược)' : ''}</strong><br>
+                        <span style="font-size:0.98rem; line-height:1.7;">${card.isReversed ? card.reversedMeaning : card.meaning}</span>
+                `;
+                if (clarifierCards[index]) {
+                    const cl = clarifierCards[index];
+                    summaryHTML += `<br><span style="color:var(--neon-purple); font-weight:500;">↳ Lá phụ <strong>${cl.name} ${cl.isReversed ? '(Ngược)' : ''}</strong> bổ trợ sâu: ${cl.isReversed ? cl.reversedMeaning : cl.meaning} (liên kết trực tiếp với tầng ${card.isReversed ? card.reversedKeyword : card.keyword} của lá chính)</span>`;
+                }
+                summaryHTML += `</div>`;
+            });
+            const deepMessages = [
+                "Từ chiều sâu vũ trụ, các lá bài đang vẽ nên một bức tranh hoàn chỉnh: mọi thứ bạn đang trải qua đều là phần của kế hoạch thiêng liêng, nơi thử thách hôm nay chính là nền tảng cho ánh sáng mai sau.",
+                "Linh hồn bạn đã khao khát nhận được thông điệp này từ nhiều kiếp. Mọi lá chính và lá phụ đều đang dẫn dắt bạn về với phiên bản cao nhất của chính mình.",
+                "Đây là khoảnh khắc tái sinh: các tầng ý nghĩa liên kết chặt chẽ, cho thấy mọi lựa chọn, mọi cảm xúc và mọi hành động của bạn đều đang được vũ trụ ghi nhận và hỗ trợ."
+            ];
+            let cosmicLink = `Từ chiều sâu vũ trụ, các lá bài đang vẽ nên một bức tranh hoàn chỉnh: <strong>${currentCards.map(c => c.isReversed ? c.reversedKeyword : c.keyword).join(' • ')}</strong>.<br><br>`;
+            cosmicLink += deepMessages[Math.floor(Math.random() * deepMessages.length)] + "<br><br>";
+            if (currentSpreadType === 'love') cosmicLink += `Trong tình yêu, các lá chính và lá phụ đã liên kết chặt chẽ để cho thấy rằng khi bạn chữa lành nội tâm, tình yêu định mệnh sẽ nở hoa mang lại sự toàn vẹn mà linh hồn bạn đã chờ đợi qua nhiều kiếp.`;
+            else if (currentSpreadType === 'career') cosmicLink += `Trong sự nghiệp, các tầng ý nghĩa của lá chính và lá phụ đã hòa quyện, cho thấy vũ trụ đang sắp xếp để bạn nhận được những gì xứng đáng với nỗ lực và tầm nhìn của mình.`;
+            else cosmicLink += `Trên hành trình linh hồn, bạn đang bước vào chu kỳ tái sinh mạnh mẽ. Mọi lá bài đều thì thầm rằng bạn đã sẵn sàng cho cấp độ tồn tại mới.`;
+            cosmicLink += `<br><br><strong>Thông điệp cuối cùng từ vũ trụ:</strong> Bạn không bao giờ cô đơn. Mọi tầng ý nghĩa, mọi nhánh phụ đều đã được dệt nên để nhắc nhở bạn: bạn là con của vũ trụ. Hãy lắng nghe, tin tưởng và hành động bằng trái tim.`;
+            summaryHTML += `<div class="summary-title">Thông Điệp Liên Kết Từ Vũ Trụ</div><p style="line-height:1.85;">${cosmicLink}</p>`;
+            const summaryBox = document.getElementById('summaryBox');
+            document.getElementById('summaryText').innerHTML = summaryHTML;
+            summaryBox.style.display = 'block';
+            summaryBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function saveReading() {
+            const spreadConf = spreadTypes[currentSpreadType];
+            const savedCards = currentCards.map((card, index) => ({
+                position: spreadConf.positions[index],
+                card: {...card},
+                clarifier: clarifierCards[index] ? {...clarifierCards[index]} : null
+            }));
+            const reading = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
+                spreadType: currentSpreadType,
+                spreadName: spreadConf.name,
+                userName: currentUserName,
+                question: currentQuestion,
+                cards: savedCards
+            };
+            readingHistory.unshift(reading);
+            if (readingHistory.length > 20) readingHistory.pop();
+            localStorage.setItem('tarotHistory', JSON.stringify(readingHistory));
+            alert('✅ Đã lưu trải bài thành công!\nBạn có thể xem lại bất kỳ lúc nào trong phần "Lịch sử trải bài".');
+        }
+
+        function showHistory() {
+            const modal = document.getElementById('historyModal');
+            const listEl = document.getElementById('historyList');
+            listEl.innerHTML = '';
+            if (readingHistory.length === 0) {
+                listEl.innerHTML = `<p style="text-align:center; padding:30px; color:#aaa;">Chưa có trải bài nào được lưu. Hãy trải bài và lưu để xem lại nhé!</p>`;
+            } else {
+                readingHistory.forEach((reading, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <strong>${reading.timestamp} — ${reading.spreadName}</strong><br>
+                                <em>${reading.question}</em>
+                            </div>
+                            <div style="font-size:0.85rem; color:var(--gold);">${reading.cards.length} lá</div>
+                        </div>
+                    `;
+                    item.onclick = () => viewPastReading(idx);
+                    listEl.appendChild(item);
+                });
+            }
+            modal.style.display = 'flex';
+        }
+
+        function hideHistory() {
+            document.getElementById('historyModal').style.display = 'none';
+        }
+
+        function clearHistory() {
+            if (confirm('Bạn chắc chắn muốn xóa TOÀN BỘ lịch sử trải bài?')) {
+                readingHistory = [];
+                localStorage.setItem('tarotHistory', '[]');
+                hideHistory();
+                showHistory();
+            }
+        }
+
+        function viewPastReading(idx) {
+            hideHistory();
+            const reading = readingHistory[idx];
+            const container = document.getElementById('spreadContainer');
+            const panel = document.getElementById('readingPanel');
+            container.innerHTML = '';
+            panel.classList.add('show');
+            document.getElementById('summaryBtn').style.display = 'none';
+            document.getElementById('readingHeader').innerHTML = `📜 Trải Bài ${reading.spreadName} • ${reading.timestamp}`;
+            let htmlCards = '';
+            reading.cards.forEach((item) => {
+                const card = item.card;
+                const emoji = card.isReversed ? card.reversedEmoji : card.emoji;
+                const revText = card.isReversed ? '<span style="color:#ff6b6b; font-size:0.8rem;">(Ngược)</span>' : '';
+                htmlCards += `
+                    <div class="card-wrapper">
+                        <div class="position-label">${item.position.title}<br><span style="font-size:0.75rem; color:#aaa; font-weight:normal;">${item.position.desc}</span></div>
+                        <div class="card-container">
+                            <div class="tarot-card flipped ${card.isReversed ? 'reversed' : ''}">
+                                <div class="card-face card-back"></div>
+                                <div class="card-face card-front">
+                                    <div class="card-emoji">${emoji}</div>
+                                    <div class="card-name">${card.name} ${revText}</div>
+                                </div>
+                            </div>
+                        </div>
+                `;
+                if (item.clarifier) {
+                    const cl = item.clarifier;
+                    const clEmoji = cl.isReversed ? cl.reversedEmoji : cl.emoji;
+                    const clRev = cl.isReversed ? '<span style="color:#ff6b6b; font-size:0.78rem;">(Ngược)</span>' : '';
+                    htmlCards += `
+                        <div class="clarifier-card ${cl.isReversed ? 'reversed' : ''}" style="animation: none; opacity:1; transform:rotate(12deg);">
+                            <div class="clarifier-inner">
+                                <div class="clarifier-tarot flipped">
+                                    <div class="clarifier-face clarifier-back"></div>
+                                    <div class="clarifier-face clarifier-front">
+                                        <div class="clarifier-emoji">${clEmoji}</div>
+                                        <div class="clarifier-name">${cl.name} ${clRev}</div>
+                                        <div class="clarifier-label">LÁ PHỤ</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                htmlCards += `</div>`;
+            });
+            container.innerHTML = htmlCards;
+            document.getElementById('detailsContainer').innerHTML = '';
+            reading.cards.forEach((item) => {
+                const card = item.card;
+                let detailHTML = `
+                    <div class="detail-box">
+                        <div class="detail-title">${item.position.title}: <span>${card.name} ${card.isReversed ? '(Ngược)' : ''}</span></div>
+                        ${getLayeredAnalysis(card, reading.spreadType)}
+                `;
+                if (item.clarifier) {
+                    detailHTML += getClarifierLayeredAnalysis(card, item.clarifier);
+                }
+                detailHTML += `</div>`;
+                document.getElementById('detailsContainer').innerHTML += detailHTML;
+            });
+        }
+
+        window.onload = () => {
+            createParticles();
+            setInterval(drawParticles, 80);
+        };
+    </script>
+</body>
+</html>
