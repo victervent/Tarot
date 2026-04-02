@@ -60,16 +60,100 @@
         .card-name { font-family: 'Cinzel Decorative', cursive; font-size: 1rem; color: var(--gold); }
         .reversed .card-emoji { transform: rotate(180deg) !important; filter: brightness(0.85) saturate(1.3); }
 
-        .clarifier-card { position: absolute; bottom: -72px; right: -88px; width: 115px; height: 172px; z-index: 15; transform: rotate(12deg); box-shadow: -10px 12px 25px rgba(0,0,0,0.85); border: 3px solid var(--neon-purple); border-radius: 12px; overflow: hidden; opacity: 0; }
-        .clarifier-inner { width: 100%; height: 100%; perspective: 1000px; position: relative; }
-        .clarifier-tarot { width: 100%; height: 100%; position: absolute; transition: transform 0.9s cubic-bezier(0.68, -0.55, 0.27, 1.55); transform-style: preserve-3d; }
+    /* === LÁ PHỤ ĐÃ SỬA HOÀN TOÀN – CHỮ CHÍNH GIỮA 100% === */
+        .clarifier-card { 
+            position: absolute; 
+            bottom: -72px; 
+            right: -88px; 
+            width: 115px; 
+            height: 172px; 
+            z-index: 15; 
+            transform: rotate(12deg); 
+            box-shadow: -10px 12px 25px rgba(0,0,0,0.85); 
+            border: 3px solid var(--neon-purple); 
+            border-radius: 12px; 
+            overflow: hidden; 
+            opacity: 0; 
+        }
+        .clarifier-inner { 
+            width: 100%; 
+            height: 100%; 
+            perspective: 1000px; 
+            position: relative; 
+        }
+        .clarifier-tarot { 
+            width: 100%; 
+            height: 100%; 
+            position: absolute; 
+            transition: transform 0.9s cubic-bezier(0.68, -0.55, 0.27, 1.55); 
+            transform-style: preserve-3d; 
+        }
         .clarifier-tarot.flipped { transform: rotateY(180deg); }
-        .clarifier-face { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; border-radius: 9px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .clarifier-back { background: linear-gradient(135deg, #1a0b2e, #4c1d95); background-image: repeating-linear-gradient(45deg, rgba(212,175,55,0.15) 25%, transparent 25%, transparent 75%, rgba(212,175,55,0.15) 75%); }
-        .clarifier-front { background: linear-gradient(135deg, #221, #3a1f5e); border: 2px solid var(--gold); transform: rotateY(180deg); padding: 8px; }
-        .clarifier-emoji { font-size: 2.4rem; margin-bottom: 6px; transition: transform 0.4s; }
-        .clarifier-name { font-size: 0.82rem; color: var(--gold); text-align: center; }
-        .clarifier-label { font-size: 0.68rem; color: var(--gold); position: absolute; bottom: 8px; letter-spacing: 1px; }
+        
+        .clarifier-face { 
+            width: 100%; 
+            height: 100%; 
+            position: absolute; 
+            backface-visibility: hidden; 
+            border-radius: 9px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            box-sizing: border-box;
+        }
+        
+        .clarifier-back { 
+            background: linear-gradient(135deg, #1a0b2e, #4c1d95); 
+            background-image: repeating-linear-gradient(45deg, rgba(212,175,55,0.15) 25%, transparent 25%, transparent 75%, rgba(212,175,55,0.15) 75%); 
+        }
+        
+        .clarifier-front { 
+            background: linear-gradient(135deg, #221, #3a1f5e); 
+            border: 2px solid var(--gold); 
+            transform: rotateY(180deg); 
+            padding: 18px 12px 42px 12px;   /* padding dưới nhiều hơn để dành chỗ cho label */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+            width: 100%;
+            gap: 8px;
+        }
+        
+        .clarifier-emoji { 
+            font-size: 2.25rem; 
+            line-height: 1;
+            flex-shrink: 0;
+            margin-bottom: 4px;
+            transition: transform 0.4s; 
+        }
+        
+        .clarifier-name { 
+            font-size: 0.76rem; 
+            color: var(--gold); 
+            text-align: center; 
+            line-height: 1.3;
+            font-weight: 500;
+            max-width: 94%;
+            padding: 0 6px;
+            word-break: break-word;
+            letter-spacing: 0.3px;
+        }
+        
+        .clarifier-label { 
+            font-size: 0.65rem; 
+            color: var(--gold); 
+            position: absolute; 
+            bottom: 9px; 
+            left: 50%;
+            transform: translateX(-50%);
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
         @keyframes clarifierFlyIn { 0% { opacity: 0; transform: translateY(80px) rotate(-45deg) scale(0.3); } 100% { opacity: 1; transform: translateY(0) rotate(12deg) scale(1); } }
         .clarifier-card.anim-in { animation: clarifierFlyIn 0.9s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; }
         .clarifier-card.reversed .clarifier-emoji { transform: rotate(180deg) !important; filter: brightness(0.85) saturate(1.3); }
@@ -108,7 +192,7 @@
         <div style="text-align:center; margin-bottom:20px;">
             <h2 id="readingHeader" style="color:var(--gold); margin:0;"></h2>
         </div>
-        <h2 style="color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold); padding-bottom: 10px;">Phân Tích Chi Tiết – Nhiều Tầng Lớp Ý Nghĩa</h2>
+        <h2 style="color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold); padding-bottom: 10px;">Phân Tích Chi Tiết</h2>
         <div id="detailsContainer"></div>
        
         <div style="text-align:center; margin:25px 0;">
@@ -557,7 +641,7 @@ const contextualMeanings = {
         let flippedCount = 0;
         let deckCopy = [];
         let currentUserName = 'Người trải bài';
-        let currentQuestion = 'Trải bài hôm nay';
+        let currentQuestion = 'Trải bài chung hôm nay';
         let readingHistory = JSON.parse(localStorage.getItem('tarotHistory') || '[]');
         let canvas, ctx, particles = [];
 
@@ -691,7 +775,7 @@ const contextualMeanings = {
                                     ${extraCard.name}
                                     ${extraCard.isReversed ? '<span style="color:#ff6b6b; font-size:0.78rem;">(Ngược)</span>' : ''}
                                 </div>
-                                <div class="clarifier-label"> Lá phụ </div>
+                                <div class="clarifier-label"></div>
                             </div>
                         </div>
                     </div>
@@ -787,44 +871,199 @@ function renderDetails() {
     });
 }
 
-        function generateSummary() {
-            const spreadConf = spreadTypes[currentSpreadType];
-            let summaryHTML = `<p style="font-size:1.2rem; line-height:1.85; margin-bottom:25px; color:#e0d4ff;">Vũ trụ vừa mở ra một câu chuyện hoàn chỉnh, đa tầng và mang tính định mệnh dành riêng cho bạn qua trải bài <strong>${spreadConf.name}</strong>. Đây là cuộc trò chuyện thiêng liêng giữa linh hồn bạn và vũ trụ.</p>`;
-            let narrative = currentCards.map((card, index) => {
-                const pos = spreadConf.positions[index];
-                return `<strong>${pos.title}</strong>: ${card.name} (${card.isReversed ? card.reversedKeyword : card.keyword})`;
-            }).join(' → ');
-            summaryHTML += `<p style="margin-bottom: 25px; padding: 18px; background: rgba(0,0,0,0.25); border-radius: 12px; border: 1px dashed var(--gold); font-size: 1.05rem;">${narrative}</p>`;
-            currentCards.forEach((card, index) => {
-                const pos = spreadConf.positions[index];
-                summaryHTML += `
-                    <div style="margin-bottom: 28px; padding: 18px; background: rgba(0,0,0,0.2); border-radius: 10px; border-left: 5px solid var(--gold);">
-                        <strong style="color:var(--gold); font-size:1.15rem;">${pos.title} – ${card.name} ${card.isReversed ? '(Ngược)' : ''}</strong><br>
-                        <span style="font-size:0.98rem; line-height:1.7;">${card.isReversed ? card.reversedMeaning : card.meaning}</span>
-                `;
-                if (clarifierCards[index]) {
-                    const cl = clarifierCards[index];
-                    summaryHTML += `<br><span style="color:var(--neon-purple); font-weight:500;">↳ Lá phụ <strong>${cl.name} ${cl.isReversed ? '(Ngược)' : ''}</strong> bổ trợ sâu: ${cl.isReversed ? cl.reversedMeaning : cl.meaning} (liên kết trực tiếp với tầng ${card.isReversed ? card.reversedKeyword : card.keyword} của lá chính)</span>`;
-                }
-                summaryHTML += `</div>`;
-            });
-            const deepMessages = [
-                "Từ chiều sâu vũ trụ, các lá bài đang vẽ nên một bức tranh hoàn chỉnh: mọi thứ bạn đang trải qua đều là phần của kế hoạch thiêng liêng, nơi thử thách hôm nay chính là nền tảng cho ánh sáng mai sau.",
-                "Linh hồn bạn đã khao khát nhận được thông điệp này từ nhiều kiếp. Mọi lá chính và lá phụ đều đang dẫn dắt bạn về với phiên bản cao nhất của chính mình.",
-                "Đây là khoảnh khắc tái sinh: các tầng ý nghĩa liên kết chặt chẽ, cho thấy mọi lựa chọn, mọi cảm xúc và mọi hành động của bạn đều đang được vũ trụ ghi nhận và hỗ trợ."
-            ];
-            let cosmicLink = `Từ chiều sâu vũ trụ, các lá bài đang vẽ nên một bức tranh hoàn chỉnh: <strong>${currentCards.map(c => c.isReversed ? c.reversedKeyword : c.keyword).join(' • ')}</strong>.<br><br>`;
-            cosmicLink += deepMessages[Math.floor(Math.random() * deepMessages.length)] + "<br><br>";
-            if (currentSpreadType === 'love') cosmicLink += `Trong tình yêu, các lá chính và lá phụ đã liên kết chặt chẽ để cho thấy rằng khi bạn chữa lành nội tâm, tình yêu định mệnh sẽ nở hoa mang lại sự toàn vẹn mà linh hồn bạn đã chờ đợi qua nhiều kiếp.`;
-            else if (currentSpreadType === 'career') cosmicLink += `Trong sự nghiệp, các tầng ý nghĩa của lá chính và lá phụ đã hòa quyện, cho thấy vũ trụ đang sắp xếp để bạn nhận được những gì xứng đáng với nỗ lực và tầm nhìn của mình.`;
-            else cosmicLink += `Trên hành trình linh hồn, bạn đang bước vào chu kỳ tái sinh mạnh mẽ. Mọi lá bài đều thì thầm rằng bạn đã sẵn sàng cho cấp độ tồn tại mới.`;
-            cosmicLink += `<br><br><strong>Thông điệp cuối cùng từ vũ trụ:</strong> Bạn không bao giờ cô đơn. Mọi tầng ý nghĩa, mọi nhánh phụ đều đã được dệt nên để nhắc nhở bạn: bạn là con của vũ trụ. Hãy lắng nghe, tin tưởng và hành động bằng trái tim.`;
-            summaryHTML += `<div class="summary-title">Thông Điệp Liên Kết Từ Vũ Trụ</div><p style="line-height:1.85;">${cosmicLink}</p>`;
-            const summaryBox = document.getElementById('summaryBox');
-            document.getElementById('summaryText').innerHTML = summaryHTML;
-            summaryBox.style.display = 'block';
-            summaryBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+// ====================== THÊM MỚI: ARCHETYPE & QUOTE (78 LÁ ĐẦY ĐỦ) ======================
+const cardExtras = {
+    // Ẩn Chính
+    "the-fool": { person: "Nhà thám hiểm ngây thơ như Alice trong xứ sở thần tiên", quote: "“Mọi cuộc phiêu lưu bắt đầu từ một bước nhảy không biết trước.”" },
+    "the-magician": { person: "Nhà ảo thuật tài ba – Merlin", quote: "“Bạn đã có tất cả công cụ cần thiết trong tay mình.”" },
+    "the-high-priestess": { person: "Nữ tư tế bí ẩn – Isis", quote: "“Điều bí ẩn nhất nằm sâu trong lòng bạn.”" },
+    "the-empress": { person: "Nữ hoàng phong phú – Demeter", quote: "“Hãy để tình yêu và sáng tạo nở hoa.”" },
+    "the-emperor": { person: "Hoàng đế nghiêm nghị – Caesar", quote: "“Cấu trúc là nền tảng của mọi thành công.”" },
+    "the-hierophant": { person: "Người thầy tinh thần – Confucius", quote: "“Truyền thống là cầu nối giữa quá khứ và tương lai.”" },
+    "the-lovers": { person: "Cặp đôi định mệnh – Romeo & Juliet", quote: "“Tình yêu chân thành là lựa chọn của linh hồn.”" },
+    "the-chariot": { person: "Chiến binh chiến thắng – Alexander Đại Đế", quote: "“Ý chí mạnh mẽ sẽ đưa bạn đến đích.”" },
+    "strength": { person: "Nữ anh hùng thuần phục sư tử – Androcles", quote: "“Sức mạnh thật sự là lòng dũng cảm dịu dàng.”" },
+    "the-hermit": { person: "Nhà hiền triết cô độc – Diogenes", quote: "“Ánh sáng chân lý chỉ tìm thấy khi ta đi vào bóng tối.”" },
+    "wheel-of-fortune": { person: "Người xoay bánh xe định mệnh – Fortuna", quote: "“Cuộc sống luôn chuyển động, hãy tin vào dòng chảy.”" },
+    "justice": { person: "Nữ thần công lý – Themis", quote: "“Công bằng là cân bằng giữa hành động và hậu quả.”" },
+    "the-hanged-man": { person: "Nhà hiền nhân treo ngược – Odin", quote: "“Buông bỏ để thấy rõ hơn.”" },
+    "death": { person: "Thần chuyển hóa – Persephone", quote: "“Kết thúc là khởi đầu của điều mới.”" },
+    "temperance": { person: "Thiên thần cân bằng – Archangel Michael", quote: "“Hài hòa là chìa khóa của mọi thứ.”" },
+    "the-devil": { person: "Kẻ cám dỗ – Lucifer", quote: "“Xiềng xích chỉ tồn tại khi ta tin nó là thật.”" },
+    "the-tower": { person: "Người sống sót sau sụp đổ – Job", quote: "“Sụp đổ hôm nay là nền tảng cho ngày mai.”" },
+    "the-star": { person: "Nữ thần hy vọng – Pandora", quote: "“Sau bóng tối luôn có ánh sao dẫn lối.”" },
+    "the-moon": { person: "Nữ thần mặt trăng – Selene", quote: "“Hãy tin trực giác khi mọi thứ chưa rõ ràng.”" },
+    "the-sun": { person: "Thần mặt trời – Apollo", quote: "“Niềm vui là ánh sáng tự nhiên của linh hồn.”" },
+    "judgement": { person: "Thiên thần phán xét – Gabriel", quote: "“Tỉnh thức là khoảnh khắc tái sinh.”" },
+    "the-world": { person: "Người hoàn thành chu kỳ – Gaia", quote: "“Bạn đã hoàn tất hành trình của chính mình.”" },
+
+    // Cốc (Cups)
+    "ace-of-cups": { person: "Nữ thần tình yêu – Aphrodite", quote: "“Tình yêu mới đang tuôn trào từ trái tim bạn.”" },
+    "two-of-cups": { person: "Cặp đôi huyền thoại – Tristan & Isolde", quote: "“Kết nối sâu sắc bắt đầu từ sự gặp gỡ của hai linh hồn.”" },
+    "three-of-cups": { person: "Ba nàng tiên vui vẻ – The Three Graces", quote: "“Niềm vui nhân lên khi ta chia sẻ cùng bạn bè.”" },
+    "four-of-cups": { person: "Nhà hiền triết thờ ơ – Buddha dưới cây Bồ Đề", quote: "“Đôi khi cơ hội đang ở ngay trước mắt mà ta không thấy.”" },
+    "five-of-cups": { person: "Người tiếc nuối – Orpheus", quote: "“Hãy nhìn vào hai cốc còn đầy thay vì ba cốc đã đổ.”" },
+    "six-of-cups": { person: "Đứa trẻ trong sáng – Peter Pan", quote: "“Ký ức đẹp từ quá khứ đang trở về để chữa lành bạn.”" },
+    "seven-of-cups": { person: "Nhà ảo mộng – Don Quixote", quote: "“Trong muôn vàn lựa chọn, hãy chọn con đường chân thật nhất.”" },
+    "eight-of-cups": { person: "Người hành hương – Thánh Francis thành Assisi", quote: "“Đôi khi phải rời bỏ để tìm thấy ý nghĩa sâu sắc hơn.”" },
+    "nine-of-cups": { person: "Người mãn nguyện – King Midas", quote: "“Điều ước của bạn đã thành hiện thực, hãy biết ơn.”" },
+    "ten-of-cups": { person: "Gia đình hạnh phúc – The Waltons", quote: "“Hạnh phúc viên mãn nằm ở mái ấm và tình thân.”" },
+    "page-of-cups": { person: "Thiếu niên mơ mộng – The Little Prince", quote: "“Tin nhắn từ trái tim đang đến với bạn.”" },
+    "knight-of-cups": { person: "Hiệp sĩ lãng mạn – Lancelot", quote: "“Lời mời gọi của tình yêu đang đến rất gần.”" },
+    "queen-of-cups": { person: "Nữ hoàng trắc ẩn – Mary Magdalene", quote: "“Trái tim bạn là nguồn chữa lành vô tận.”" },
+    "king-of-cups": { person: "Vua cảm xúc – King Solomon", quote: "“Trưởng thành cảm xúc là sức mạnh lớn nhất.”" },
+
+    // Gậy (Wands)
+    "ace-of-wands": { person: "Thần lửa sáng tạo – Prometheus", quote: "“Ngọn lửa đam mê mới vừa bùng lên trong bạn.”" },
+    "two-of-wands": { person: "Nhà thám hiểm thế giới – Marco Polo", quote: "“Tương lai đang chờ bạn chọn hướng đi.”" },
+    "three-of-wands": { person: "Thuyền trưởng nhìn xa – Columbus", quote: "“Cơ hội từ xa đang tiến gần.”" },
+    "four-of-wands": { person: "Gia chủ ấm cúng – Odysseus trở về", quote: "“Nhà là nơi trái tim bình yên.”" },
+    "five-of-wands": { person: "Các hiệp sĩ tranh tài – Knights of the Round Table", quote: "“Cạnh tranh lành mạnh sẽ giúp bạn tiến bộ.”" },
+    "six-of-wands": { person: "Chiến thắng công khai – Napoleon", quote: "“Bạn sắp được công nhận xứng đáng.”" },
+    "seven-of-wands": { person: "Chiến binh kiên cường – Leonidas", quote: "“Hãy đứng vững trước mọi thử thách.”" },
+    "eight-of-wands": { person: "Tin sứ nhanh nhẹn – Hermes", quote: "“Mọi thứ đang chuyển động cực nhanh.”" },
+    "nine-of-wands": { person: "Người lính gác cuối cùng – The Last Samurai", quote: "“Bạn đã mệt mỏi nhưng vẫn còn sức mạnh cuối cùng.”" },
+    "ten-of-wands": { person: "Người gánh nặng – Atlas", quote: "“Đã đến lúc buông bớt gánh nặng.”" },
+    "page-of-wands": { person: "Thiếu niên nhiệt huyết – Icarus", quote: "“Ý tưởng mới đầy lửa đang đến.”" },
+    "knight-of-wands": { person: "Hiệp sĩ phiêu lưu – Don Quixote", quote: "“Hành động nhanh chóng và đầy đam mê.”" },
+    "queen-of-wands": { person: "Nữ hoàng quyến rũ – Cleopatra", quote: "“Bạn đang toả sáng với sức sống rực rỡ.”" },
+    "king-of-wands": { person: "Vua truyền cảm hứng – King Arthur", quote: "“Tầm nhìn của bạn sẽ dẫn dắt mọi người.”" },
+
+    // Kiếm (Swords)
+    "ace-of-swords": { person: "Thần trí tuệ – Athena", quote: "“Sự thật rõ ràng đang được vạch ra.”" },
+    "two-of-swords": { person: "Người bịt mắt – Lady Justice", quote: "“Hãy tháo bỏ lớp che mắt để quyết định.”" },
+    "three-of-swords": { person: "Người đau lòng – Ophelia", quote: "“Nỗi đau hôm nay sẽ giúp bạn trưởng thành.”" },
+    "four-of-swords": { person: "Người nghỉ ngơi – Galahad", quote: "“Nghỉ ngơi là cần thiết để hồi phục.”" },
+    "five-of-swords": { person: "Chiến binh cô đơn – Achilles", quote: "“Đôi khi thắng cuộc nhưng mất hết mối quan hệ.”" },
+    "six-of-swords": { person: "Người chuyển tiếp – Aeneas", quote: "“Bạn đang rời khỏi vùng tối để sang bờ sáng.”" },
+    "seven-of-swords": { person: "Kẻ trộm khôn ngoan – Odysseus", quote: "“Chiến lược khôn ngoan đôi khi cần thiết.”" },
+    "eight-of-swords": { person: "Người tự giam cầm – Rapunzel", quote: "“Bạn có thể tự giải thoát bất cứ lúc nào.”" },
+    "nine-of-swords": { person: "Người lo âu đêm khuya – Lady Macbeth", quote: "“Ác mộng sẽ tan khi bình minh đến.”" },
+    "ten-of-swords": { person: "Người nằm đáy vực – Prometheus", quote: "“Đây là đáy vực, từ đây chỉ có thể lên.”" },
+    "page-of-swords": { person: "Thiếu niên tò mò – Sherlock Holmes trẻ", quote: "“Tin tức mới hoặc ý tưởng sắc bén đang đến.”" },
+    "knight-of-swords": { person: "Hiệp sĩ quyết đoán – Lancelot", quote: "“Hành động nhanh và dứt khoát.”" },
+    "queen-of-swords": { person: "Nữ hoàng sắc sảo – Elizabeth I", quote: "“Sự thật và độc lập là sức mạnh của bạn.”" },
+    "king-of-swords": { person: "Vua công bằng – King Solomon", quote: "“Lý trí sắc bén sẽ dẫn bạn đến công lý.”" },
+
+    // Tiền (Pentacles)
+    "ace-of-pentacles": { person: "Nữ thần thịnh vượng – Lakshmi", quote: "“Cơ hội vàng về vật chất đang mở ra.”" },
+    "two-of-pentacles": { person: "Người xiếc cân bằng – The Juggler", quote: "“Bạn đang khéo léo cân bằng nhiều việc.”" },
+    "three-of-pentacles": { person: "Thợ xây tài ba – Ictinus (Parthenon)", quote: "“Thành công đến từ sự hợp tác và kỹ năng.”" },
+    "four-of-pentacles": { person: "Người keo kiệt – Ebenezer Scrooge", quote: "“Hãy buông bỏ để dòng chảy tiền bạc tiếp tục.”" },
+    "five-of-pentacles": { person: "Người nghèo khổ ngoài tuyết – The Paupers", quote: "“Giúp đỡ đang đến, bạn không cô đơn.”" },
+    "six-of-pentacles": { person: "Nhà từ thiện – Saint Nicholas", quote: "“Cho và nhận cân bằng mang lại hạnh phúc.”" },
+    "seven-of-pentacles": { person: "Người nông dân kiên nhẫn – Ceres", quote: "“Hãy kiên nhẫn chờ thành quả.”" },
+    "eight-of-pentacles": { person: "Thợ thủ công tài ba – Hephaestus", quote: "“Chăm chỉ hôm nay sẽ tạo nên kiệt tác mai sau.”" },
+    "nine-of-pentacles": { person: "Nữ quý tộc độc lập – The Lady of Shalott", quote: "“Bạn đang tự do và sung túc.”" },
+    "ten-of-pentacles": { person: "Gia tộc thịnh vượng – The Rothschilds", quote: "“Di sản lâu dài đang được xây dựng.”" },
+    "page-of-pentacles": { person: "Học trò chăm chỉ – Young Isaac Newton", quote: "“Cơ hội học hỏi mới đang đến.”" },
+    "knight-of-pentacles": { person: "Người nông dân đáng tin – Saint Isidore", quote: "“Chăm chỉ và kiên trì là chìa khóa.”" },
+    "queen-of-pentacles": { person: "Nữ hoàng chu đáo – Queen Victoria", quote: "“Bạn đang nuôi dưỡng cả sự nghiệp lẫn bản thân.”" },
+    "king-of-pentacles": { person: "Vua giàu có – King Midas (phiên bản khôn ngoan)", quote: "“Thành công vật chất và ổn định đang thuộc về bạn.”" }
+};
+
+     function generateSummary() {
+    const spreadConf = spreadTypes[currentSpreadType];
+    
+    let summaryHTML = `<p style="font-size:1.2rem; line-height:1.85; margin-bottom:25px; color:#e0d4ff;">
+        Vũ trụ vừa mở ra một câu chuyện hoàn chỉnh, đa tầng và mang tính định mệnh dành riêng cho bạn qua trải bài <strong>${spreadConf.name}</strong>. 
+        Đây là cuộc trò chuyện thiêng liêng giữa linh hồn bạn và vũ trụ.
+    </p>`;
+
+    // Narrative
+    let narrative = currentCards.map((card, index) => {
+        const pos = spreadConf.positions[index];
+        return `<strong>${pos.title}</strong>: ${card.name} (${card.isReversed ? card.reversedKeyword : card.keyword})`;
+    }).join(' → ');
+    summaryHTML += `<p style="margin-bottom: 25px; padding: 18px; background: rgba(0,0,0,0.25); border-radius: 12px; border: 1px dashed var(--gold); font-size: 1.05rem;">${narrative}</p>`;
+
+    // Chi tiết từng lá
+    currentCards.forEach((card, index) => {
+        const pos = spreadConf.positions[index];
+        summaryHTML += `
+            <div style="margin-bottom: 28px; padding: 18px; background: rgba(0,0,0,0.2); border-radius: 10px; border-left: 5px solid var(--gold);">
+                <strong style="color:var(--gold); font-size:1.15rem;">${pos.title} – ${card.name} ${card.isReversed ? '(Ngược)' : ''}</strong><br>
+                <span style="font-size:0.98rem; line-height:1.7;">${card.isReversed ? card.reversedMeaning : card.meaning}</span>`;
+        if (clarifierCards[index]) {
+            const cl = clarifierCards[index];
+            summaryHTML += `<br><span style="color:var(--neon-purple); font-weight:500;">↳ Lá phụ <strong>${cl.name} ${cl.isReversed ? '(Ngược)' : ''}</strong> bổ trợ sâu: ${cl.isReversed ? cl.reversedMeaning : cl.meaning}</span>`;
         }
+        summaryHTML += `</div>`;
+    });
+
+    // ====================== THÔNG ĐIỆP LIÊN KẾT TỪ VŨ TRỤ (ĐÃ LÀM ĐA DẠNG NHIỀU KIỂU) ======================
+    const deepMessages = [
+        "Từ chiều sâu vũ trụ, các lá bài đang vẽ nên một bức tranh hoàn chỉnh: mọi thứ bạn đang trải qua đều là phần của kế hoạch thiêng liêng, nơi thử thách hôm nay chính là nền tảng cho ánh sáng mai sau.",
+        "Linh hồn bạn đã khao khát nhận được thông điệp này từ nhiều kiếp. Mọi lá chính và lá phụ đều đang dẫn dắt bạn về với phiên bản cao nhất, rực rỡ nhất của chính mình.",
+        "Đây là khoảnh khắc tái sinh linh hồn: các tầng ý nghĩa liên kết chặt chẽ, cho thấy mọi lựa chọn, mọi cảm xúc và mọi hành động của bạn đều được vũ trụ ghi nhận và ban phước.",
+        "Vũ trụ đang thì thầm qua từng lá bài rằng bạn không bao giờ cô đơn. Mọi bước chân, mọi nước mắt, mọi niềm vui đều có ý nghĩa sâu sắc trong hành trình tiến hóa của linh hồn.",
+        "Các vì sao đang sắp xếp, dòng năng lượng vũ trụ đang chảy về phía bạn. Hãy mở lòng đón nhận vì bạn xứng đáng với tất cả những điều tốt đẹp đang đến."
+    ];
+
+    let cosmicLink = `Từ chiều sâu vũ trụ, các lá bài đang vẽ nên một bức tranh hoàn chỉnh: <strong>${currentCards.map(c => c.isReversed ? c.reversedKeyword : c.keyword).join(' • ')}</strong>.<br><br>`;
+    cosmicLink += deepMessages[Math.floor(Math.random() * deepMessages.length)] + "<br><br>";
+
+    // Phần tình yêu được làm đa dạng nhiều kiểu
+    if (currentSpreadType === 'love') {
+        const loveMessages = [
+            "Trong tình yêu, chữa lành nội tâm là chìa khóa quan trọng nhất để đón nhận tình yêu đích thực và sâu sắc. Khi bạn dũng cảm đối diện và chữa lành vết thương cũ, vũ trụ sẽ sắp xếp một mối liên kết linh hồn chân thành và bền vững.",
+            "Tình yêu lúc này là bài học lớn về sự chân thành và buông bỏ. Vũ trụ nhắc nhở rằng chỉ khi trái tim bạn được chữa lành, tình yêu mới thực sự nở hoa và mang lại sự toàn vẹn mà linh hồn bạn đã chờ đợi qua nhiều kiếp.",
+            "Trong hành trình tình cảm, lá bài đang chỉ ra rằng tình yêu đích thực không đến từ sự hoàn hảo, mà đến từ sự dũng cảm mở lòng và tin tưởng. Hãy chữa lành chính mình trước khi đón nhận người ấy.",
+            "Vũ trụ đang gửi đến bạn thông điệp: Tình yêu sâu sắc chỉ thực sự đến khi bạn học được cách yêu thương và chữa lành bản thân. Đó là nền tảng cho một mối quan hệ hài hòa và lâu dài.",
+            "Trong tình yêu, mọi thử thách hiện tại đều là cơ hội để bạn trưởng thành. Khi bạn sẵn sàng buông bỏ nỗi đau cũ, tình yêu định mệnh sẽ đến và mang lại ánh sáng cho trái tim bạn."
+        ];
+        cosmicLink += loveMessages[Math.floor(Math.random() * loveMessages.length)];
+    } 
+    else if (currentSpreadType === 'career') {
+        cosmicLink += `Trong sự nghiệp, vũ trụ đang thử thách và rèn luyện bạn để trở thành phiên bản mạnh mẽ hơn. Hãy tin rằng mọi nỗ lực, mọi bài học đều đang dẫn bạn đến vị trí xứng đáng với tài năng và tầm nhìn của mình.`;
+    } 
+    else {
+        cosmicLink += `Trên hành trình linh hồn, bạn đang bước vào một chu kỳ chuyển hóa mạnh mẽ. Mọi thử thách đều là bài học cần thiết để bạn lột xác, trở nên toàn vẹn và gần gũi hơn với bản ngã cao nhất.`;
+    }
+
+    // Thông điệp cuối cùng cũng được làm đa dạng
+    const finalMessages = [
+        "Thông điệp cuối cùng từ vũ trụ: Hãy lắng nghe trái tim, tin tưởng và dũng cảm bước tiếp. Ánh sáng luôn ở phía trước.",
+        "Thông điệp cuối cùng từ vũ trụ: Bạn không bao giờ cô đơn. Hãy mở lòng đón nhận và tin tưởng vào dòng chảy của định mệnh.",
+        "Thông điệp cuối cùng từ vũ trụ: Mọi tầng ý nghĩa đều nhắc nhở bạn – bạn là con của vũ trụ. Hãy yêu thương bản thân và dũng cảm sống trọn vẹn.",
+        "Thông điệp cuối cùng từ vũ trụ: Ánh sáng đang chờ bạn ở phía trước. Hãy tin tưởng, chữa lành và bước đi với trái tim rộng mở.",
+        "Thông điệp cuối cùng từ vũ trụ: Vũ trụ luôn ủng hộ bạn. Hãy lắng nghe tiếng lòng và dũng cảm theo đuổi những gì trái tim thật sự khao khát."
+    ];
+    cosmicLink += `<br><br><strong>${finalMessages[Math.floor(Math.random() * finalMessages.length)]}</strong>`;
+
+    summaryHTML += `
+        <div class="summary-title">Thông Điệp Liên Kết Từ Vũ Trụ</div>
+        <p style="line-height:1.85;">${cosmicLink}</p>
+    `;
+
+    // Archetype & Câu Nói Tượng Trưng (giữ nguyên)
+    summaryHTML += `
+        <div style="margin-top: 35px; padding: 25px; background: rgba(212,175,55,0.12); border: 1px solid var(--gold); border-radius: 12px;">
+            <div style="color: var(--gold); font-family: 'Cinzel Decorative', cursive; font-size: 1.35rem; text-align: center; margin-bottom: 20px;">
+                🔮 Archetype & Câu Nói Tượng Trưng
+            </div>`;
+
+    currentCards.forEach((card) => {
+        const extras = cardExtras[card.id];
+        let selected = { person: "Một linh hồn trên hành trình", quote: "“Mọi thứ đều có ý nghĩa riêng của nó.”" };
+        if (extras && extras.options && extras.options.length > 0) {
+            selected = extras.options[Math.floor(Math.random() * extras.options.length)];
+        }
+        summaryHTML += `
+            <div style="margin-bottom: 22px; padding: 16px; background: rgba(0,0,0,0.25); border-radius: 10px;">
+                <strong style="color:#e0d4ff;">${card.name} ${card.isReversed ? '(Ngược)' : ''}</strong><br>
+                👤 <em>Người tượng trưng:</em> ${selected.person}<br>
+                💬 <em>Câu nói sâu sắc:</em> “${selected.quote}”
+            </div>`;
+    });
+
+    summaryHTML += `</div>`;
+
+    document.getElementById('summaryText').innerHTML = summaryHTML;
+    document.getElementById('summaryBox').style.display = 'block';
+    document.getElementById('summaryBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}   
 
         function saveReading() {
             const spreadConf = spreadTypes[currentSpreadType];
