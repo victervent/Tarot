@@ -1038,25 +1038,33 @@ const cardExtras = {
     `;
 
     // Archetype & Câu Nói Tượng Trưng (giữ nguyên)
+        // === ARCHETYPE & CÂU NÓI TƯỢNG TRƯNG - HIỂN THỊ ĐẸP HƠN ===
     summaryHTML += `
-        <div style="margin-top: 35px; padding: 25px; background: rgba(212,175,55,0.12); border: 1px solid var(--gold); border-radius: 12px;">
-            <div style="color: var(--gold); font-family: 'Cinzel Decorative', cursive; font-size: 1.35rem; text-align: center; margin-bottom: 20px;">
-                🔮 Archetype & Câu Nói Tượng Trưng
+        <div style="margin-top: 40px; padding: 25px; background: rgba(212,175,55,0.12); border: 1px solid var(--gold); border-radius: 12px;">
+            <div style="color: var(--gold); font-family: 'Cinzel Decorative', cursive; font-size: 1.4rem; text-align: center; margin-bottom: 25px;">
+                🔮 Archetype 
             </div>`;
 
     currentCards.forEach((card) => {
-        const extras = cardExtras[card.id];
-        let selected = { person: "Một linh hồn trên hành trình", quote: "“Mọi thứ đều có ý nghĩa riêng của nó.”" };
-        if (extras && extras.options && extras.options.length > 0) {
-            selected = extras.options[Math.floor(Math.random() * extras.options.length)];
-        }
+        const extras = cardExtras[card.id] || {};
+        const person = extras.person || "Một linh hồn trên hành trình";
+        const quote = extras.quote || "“Mọi thứ đều có ý nghĩa riêng của nó.”";
+
         summaryHTML += `
-            <div style="margin-bottom: 22px; padding: 16px; background: rgba(0,0,0,0.25); border-radius: 10px;">
-                <strong style="color:#e0d4ff;">${card.name} ${card.isReversed ? '(Ngược)' : ''}</strong><br>
-                👤 <em>Người tượng trưng:</em> ${selected.person}<br>
-                💬 <em>Câu nói sâu sắc:</em> “${selected.quote}”
+            <div style="margin-bottom: 25px; padding: 18px; background: rgba(0,0,0,0.3); border-radius: 12px; border-left: 4px solid var(--gold);">
+                <strong style="color:#ffd700; font-size: 1.1rem;">${card.name} ${card.isReversed ? '(Ngược)' : ''}</strong><br><br>
+                
+                <span style="color: #e0d4ff;">👤 <strong>Người / Nhân vật tượng trưng:</strong></span><br>
+                <span style="font-style: italic; color: #d4af37;">${person}</span><br><br>
+                
+                <span style="color: #e0d4ff;">💬 <strong>Câu nói sâu sắc:</strong></span><br>
+                <span style="font-size: 1.05rem; line-height: 1.5; color: #f0e6ff;">
+                    “${quote}”
+                </span>
             </div>`;
     });
+
+    summaryHTML += `</div>`;
 
     summaryHTML += `</div>`;
 
@@ -1065,27 +1073,41 @@ const cardExtras = {
     document.getElementById('summaryBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }   
 
-        function saveReading() {
-            const spreadConf = spreadTypes[currentSpreadType];
-            const savedCards = currentCards.map((card, index) => ({
-                position: spreadConf.positions[index],
-                card: {...card},
-                clarifier: clarifierCards[index] ? {...clarifierCards[index]} : null
-            }));
-            const reading = {
-                id: Date.now(),
-                timestamp: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
-                spreadType: currentSpreadType,
-                spreadName: spreadConf.name,
-                userName: currentUserName,
-                question: currentQuestion,
-                cards: savedCards
-            };
-            readingHistory.unshift(reading);
-            if (readingHistory.length > 20) readingHistory.pop();
-            localStorage.setItem('tarotHistory', JSON.stringify(readingHistory));
-            alert('✅ Đã lưu trải bài thành công!\nBạn có thể xem lại bất kỳ lúc nào trong phần "Lịch sử trải bài".');
-        }
+      function saveReading() {
+    const spreadConf = spreadTypes[currentSpreadType];
+    
+    // Lấy thông điệp liên kết từ vũ trụ nếu đã tạo
+    let cosmicMessage = "Chưa tạo thông điệp liên kết từ vũ trụ.";
+    const summaryBox = document.getElementById('summaryBox');
+    if (summaryBox && summaryBox.style.display !== 'none') {
+        const summaryText = document.getElementById('summaryText');
+        if (summaryText) cosmicMessage = summaryText.innerHTML;
+    }
+
+    const savedCards = currentCards.map((card, index) => ({
+        position: spreadConf.positions[index],
+        card: {...card},
+        clarifier: clarifierCards[index] ? {...clarifierCards[index]} : null
+    }));
+
+    const reading = {
+        id: Date.now(),
+        timestamp: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
+        spreadType: currentSpreadType,
+        spreadName: spreadConf.name,
+        userName: currentUserName,
+        question: currentQuestion,
+        cards: savedCards,
+        cosmicMessage: cosmicMessage
+    };
+
+    readingHistory.unshift(reading);
+    if (readingHistory.length > 20) readingHistory.pop();
+    
+    localStorage.setItem('tarotHistory', JSON.stringify(readingHistory));
+    
+    alert('✅ Đã lưu trải bài thành công!\nBao gồm cả "Thông điệp liên kết từ vũ trụ".');
+}
 
         function showHistory() {
             const modal = document.getElementById('historyModal');
@@ -1126,20 +1148,23 @@ const cardExtras = {
             }
         }
 
-        function viewPastReading(idx) {
+               function viewPastReading(idx) {
             hideHistory();
             const reading = readingHistory[idx];
             const container = document.getElementById('spreadContainer');
             const panel = document.getElementById('readingPanel');
+            
             container.innerHTML = '';
             panel.classList.add('show');
             document.getElementById('summaryBtn').style.display = 'none';
             document.getElementById('readingHeader').innerHTML = `📜 Trải Bài ${reading.spreadName} • ${reading.timestamp}`;
+
             let htmlCards = '';
             reading.cards.forEach((item) => {
                 const card = item.card;
                 const emoji = card.isReversed ? card.reversedEmoji : card.emoji;
                 const revText = card.isReversed ? '<span style="color:#ff6b6b; font-size:0.8rem;">(Ngược)</span>' : '';
+                
                 htmlCards += `
                     <div class="card-wrapper">
                         <div class="position-label">${item.position.title}<br><span style="font-size:0.75rem; color:#aaa; font-weight:normal;">${item.position.desc}</span></div>
@@ -1153,6 +1178,7 @@ const cardExtras = {
                             </div>
                         </div>
                 `;
+
                 if (item.clarifier) {
                     const cl = item.clarifier;
                     const clEmoji = cl.isReversed ? cl.reversedEmoji : cl.emoji;
@@ -1175,6 +1201,8 @@ const cardExtras = {
                 htmlCards += `</div>`;
             });
             container.innerHTML = htmlCards;
+
+            // === Phần chi tiết từng lá ===
             document.getElementById('detailsContainer').innerHTML = '';
             reading.cards.forEach((item) => {
                 const card = item.card;
@@ -1184,17 +1212,22 @@ const cardExtras = {
                         ${getLayeredAnalysis(card, reading.spreadType)}
                 `;
                 if (item.clarifier) {
-                    detailHTML += getClarifierLayeredAnalysis(card, item.clarifier);
+                    detailHTML += getClarifierLayeredAnalysis(card, item.clarifier, reading.spreadType);
                 }
                 detailHTML += `</div>`;
                 document.getElementById('detailsContainer').innerHTML += detailHTML;
             });
-        }
 
-        window.onload = () => {
-            createParticles();
-            setInterval(drawParticles, 80);
-        };
+            // === PHẦN QUAN TRỌNG: HIỂN THỊ THÔNG ĐIỆP LIÊN KẾT TỪ VŨ TRỤ ===
+            if (reading.cosmicMessage && reading.cosmicMessage !== "Chưa tạo thông điệp liên kết từ vũ trụ.") {
+                const cosmicHTML = `
+                    <div class="summary-box" style="margin-top: 35px;">
+                        <div class="summary-title">Thông Điệp Liên Kết Từ Vũ Trụ</div>
+                        <div style="line-height:1.65; padding: 15px 0;">${reading.cosmicMessage}</div>
+                    </div>`;
+                document.getElementById('detailsContainer').innerHTML += cosmicHTML;
+            }
+        }
     </script>
 </body>
 </html>
