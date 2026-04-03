@@ -1465,6 +1465,7 @@ function getContextualMeaning(card, spreadType, isReversed, positionIndex = 0) {
     return coreMeaning + (positionFlavor ? `<br><br><span style="color:#ff9f1c; font-weight:600;">${positionFlavor}</span>` : '');
 }
      // ====================== NGUYÊN TỐ + SỐ HỌC TAROT 
+// ====================== NGUYÊN TỐ + SỐ HỌC TAROT (NGUYÊN TỐ CỐ ĐỊNH HỢP BÀI + 10 Ý NGHĨA MỖI TẦNG) ======================
 function getElementAndNumerology(card, isReversed) {
     let element = "";
     let elementEmoji = "";
@@ -1472,62 +1473,208 @@ function getElementAndNumerology(card, isReversed) {
     let number = "";
     let numberMeaning = "";
 
-    // Kiểm tra xem có phải lá đặc biệt (chỉ có khi deck 79 hoặc 80)
     const isSpecialCard = card.id === "the-unknown" || card.id === "the-cosmos";
 
-    // ── XÁC ĐỊNH NGUYÊN TỐ ─────────────────────────────────────
-    if (card.id.includes("cups")) {
-        element = "Nước"; elementEmoji = "🌊";
-        elementDesc = isReversed 
-            ? "Dòng cảm xúc đang bị tắc nghẽn, cần chữa lành trái tim và buông bỏ tổn thương cũ" 
-            : "Dòng chảy tình yêu, trực giác mạnh mẽ và sự nuôi dưỡng nội tâm sâu sắc";
-    } 
-    else if (card.id.includes("wands")) {
-        element = "Lửa"; elementEmoji = "🔥";
-        elementDesc = isReversed 
-            ? "Ngọn lửa đam mê đang bị dập tắt hoặc bùng lên không kiểm soát" 
-            : "Đam mê sáng tạo, năng lượng bùng nổ và sức mạnh hành động";
-    } 
-    else if (card.id.includes("swords")) {
-        element = "Khí"; elementEmoji = "💨";
-        elementDesc = isReversed 
-            ? "Suy nghĩ hỗn loạn, cần làm rõ sự thật và tháo gỡ nút thắt trong tâm trí" 
-            : "Trí tuệ sắc bén, logic rõ ràng và sự thật được phơi bày";
-    } 
-    else if (card.id.includes("pentacles")) {
-        element = "Đất"; elementEmoji = "🌍";
-        elementDesc = isReversed 
-            ? "Nền tảng vật chất đang lung lay hoặc bạn đang quá bám víu vào an toàn" 
-            : "Thực tế, tiền bạc, công việc ổn định và sự thịnh vượng lâu dài";
-    } 
-    else {
-        // Đây là lá Major Arcana hoặc lá đặc biệt
-        if (isSpecialCard || currentDeckSize >= 79) {
-            // Chỉ hiển thị "Vũ Trụ" khi là lá đặc biệt hoặc deck 79/80
-            element = "Vũ Trụ"; 
-            elementEmoji = "✨";
-            elementDesc = isReversed 
-                ? "Bài học định mệnh đang bị kháng cự, cần buông bỏ để linh hồn tiến hóa" 
-                : "Bài học linh hồn lớn, kết nối trực tiếp với định mệnh vũ trụ";
-        } 
-        else {
-            // Deck 78 lá bình thường → Major Arcana KHÔNG hiện Vũ Trụ, chỉ hiện 4 nguyên tố
-            // Random 1 trong 4 nguyên tố để vẫn đẹp và cân bằng
-            const elements = [
-                { name: "Nước", emoji: "🌊", desc: isReversed ? "Cảm xúc sâu kín đang cần được giải phóng" : "Năng lượng tình cảm và trực giác" },
-                { name: "Lửa", emoji: "🔥", desc: isReversed ? "Đam mê bị kìm hãm hoặc quá mạnh" : "Sức mạnh sáng tạo và hành động" },
-                { name: "Khí", emoji: "💨", desc: isReversed ? "Tâm trí đang hỗn loạn" : "Trí tuệ và sự rõ ràng" },
-                { name: "Đất", emoji: "🌍", desc: isReversed ? "Nền tảng đang cần củng cố" : "Sự ổn định và thực tế" }
-            ];
-            const randomEl = elements[Math.floor(Math.random() * elements.length)];
-            element = randomEl.name;
-            elementEmoji = randomEl.emoji;
-            elementDesc = randomEl.desc;
-        }
-    }
+    // ====================== 1. NGUYÊN TỐ CỐ ĐỊNH HỢP VỚI TỪNG LÁ (KHÔNG RANDOM NỮA) ======================
+    const fixedElementMap = {
+        // Minor Arcana
+        "ace-of-cups": "Nước", "two-of-cups": "Nước", "three-of-cups": "Nước", "four-of-cups": "Nước",
+        "five-of-cups": "Nước", "six-of-cups": "Nước", "seven-of-cups": "Nước", "eight-of-cups": "Nước",
+        "nine-of-cups": "Nước", "ten-of-cups": "Nước", "page-of-cups": "Nước", "knight-of-cups": "Nước",
+        "queen-of-cups": "Nước", "king-of-cups": "Nước",
 
-    // ── SỐ HỌC (giữ nguyên như cũ) ─────────────────────────────────────
-    if (card.id.includes("ace"))     { number = "1"; numberMeaning = isReversed ? "Khởi đầu bị trì hoãn hoặc sai hướng" : "Tiềm năng thuần khiết – hạt giống của một chương mới"; }
+        "ace-of-wands": "Lửa", "two-of-wands": "Lửa", "three-of-wands": "Lửa", "four-of-wands": "Lửa",
+        "five-of-wands": "Lửa", "six-of-wands": "Lửa", "seven-of-wands": "Lửa", "eight-of-wands": "Lửa",
+        "nine-of-wands": "Lửa", "ten-of-wands": "Lửa", "page-of-wands": "Lửa", "knight-of-wands": "Lửa",
+        "queen-of-wands": "Lửa", "king-of-wands": "Lửa",
+
+        "ace-of-swords": "Khí", "two-of-swords": "Khí", "three-of-swords": "Khí", "four-of-swords": "Khí",
+        "five-of-swords": "Khí", "six-of-swords": "Khí", "seven-of-swords": "Khí", "eight-of-swords": "Khí",
+        "nine-of-swords": "Khí", "ten-of-swords": "Khí", "page-of-swords": "Khí", "knight-of-swords": "Khí",
+        "queen-of-swords": "Khí", "king-of-swords": "Khí",
+
+        "ace-of-pentacles": "Đất", "two-of-pentacles": "Đất", "three-of-pentacles": "Đất", "four-of-pentacles": "Đất",
+        "five-of-pentacles": "Đất", "six-of-pentacles": "Đất", "seven-of-pentacles": "Đất", "eight-of-pentacles": "Đất",
+        "nine-of-pentacles": "Đất", "ten-of-pentacles": "Đất", "page-of-pentacles": "Đất", "knight-of-pentacles": "Đất",
+        "queen-of-pentacles": "Đất", "king-of-pentacles": "Đất",
+
+        // Major Arcana – Nguyên tố truyền thống hợp lý
+        "the-fool": "Khí",
+        "the-magician": "Khí",
+        "the-high-priestess": "Nước",
+        "the-empress": "Đất",
+        "the-emperor": "Lửa",
+        "the-hierophant": "Đất",
+        "the-lovers": "Khí",
+        "the-chariot": "Nước",
+        "strength": "Lửa",
+        "the-hermit": "Đất",
+        "wheel-of-fortune": "Lửa",
+        "justice": "Khí",
+        "the-hanged-man": "Nước",
+        "death": "Nước",
+        "temperance": "Lửa",
+        "the-devil": "Đất",
+        "the-tower": "Lửa",
+        "the-star": "Khí",
+        "the-moon": "Nước",
+        "the-sun": "Lửa",
+        "judgement": "Lửa",
+        "the-world": "Đất",
+        "the-unknown": "Vũ Trụ",
+        "the-cosmos": "Vũ Trụ"
+    };
+
+    const fixedEmojiMap = {
+        "Nước": "🌊", "Lửa": "🔥", "Khí": "💨", "Đất": "🌍", "Vũ Trụ": "✨"
+    };
+
+    element = fixedElementMap[card.id] || "Vũ Trụ";
+    elementEmoji = fixedEmojiMap[element];
+
+    // ====================== 2. 10 Ý NGHĨA KHÁC NHAU CHO MỖI NGUYÊN TỐ (theo upright/reversed) ======================
+    const elementFlavors = {
+        "Nước": {
+            upright: [
+                "Dòng chảy cảm xúc đang tuôn trào, nuôi dưỡng trái tim và trực giác mạnh mẽ.",
+                "Năng lượng nước mang lại sự chữa lành sâu sắc và tình yêu vô điều kiện.",
+                "Trực giác của bạn đang rất nhạy bén, hãy lắng nghe tiếng lòng.",
+                "Lá bài nhấn mạnh sự dịu dàng, nuôi dưỡng và kết nối cảm xúc.",
+                "Dòng nước đang mang đến sự trong sáng và khả năng tha thứ.",
+                "Bạn đang được mời gọi mở rộng trái tim và đón nhận tình thương.",
+                "Năng lượng nước giúp bạn chữa lành vết thương cũ một cách nhẹ nhàng.",
+                "Đây là lúc cảm xúc chảy tự nhiên và mang lại sự bình an nội tâm.",
+                "Trái tim bạn đang được vũ trụ ôm ấp bằng dòng chảy yêu thương.",
+                "Nước tượng trưng cho sự sâu sắc, mộng mơ và khả năng đồng cảm cao."
+            ],
+            reversed: [
+                "Dòng cảm xúc đang bị tắc nghẽn, cần chữa lành trái tim và buông bỏ tổn thương cũ.",
+                "Cảm xúc bị kìm nén hoặc quá dâng trào, dễ dẫn đến mất cân bằng.",
+                "Bạn đang cần dừng lại để lắng nghe và giải phóng cảm xúc tiêu cực.",
+                "Năng lượng nước ngược nhắc bạn đừng để cảm xúc chi phối quá mức.",
+                "Có thể bạn đang che giấu nỗi đau hoặc sợ mở lòng.",
+                "Dòng chảy tình cảm bị đảo ngược – cần thời gian để cân bằng lại.",
+                "Lá bài cảnh báo cảm xúc đang bị ứ đọng, dễ gây mệt mỏi nội tâm.",
+                "Hãy để nước rửa sạch những gì không còn thuộc về bạn.",
+                "Cảm xúc ngược nhắc bạn đặt giới hạn và bảo vệ trái tim.",
+                "Đây là lúc cần chữa lành sâu để dòng nước tình cảm chảy trở lại."
+            ]
+        },
+        "Lửa": {
+            upright: [
+                "Đam mê sáng tạo bùng nổ, năng lượng hành động đang rất mạnh mẽ.",
+                "Ngọn lửa nội tại đang cháy sáng, thúc đẩy bạn tiến về phía trước.",
+                "Lá bài mang năng lượng nhiệt huyết, tự tin và sức sống rực rỡ.",
+                "Bạn đang được vũ trụ tiếp thêm lửa để thực hiện ý tưởng lớn.",
+                "Lửa tượng trưng cho sự dũng cảm, lãnh đạo và sức mạnh sáng tạo.",
+                "Năng lượng lửa giúp bạn vượt qua thử thách một cách nhanh chóng.",
+                "Đây là lúc đam mê của bạn đang dẫn dắt con đường thành công.",
+                "Lửa mang lại sự nhiệt huyết và khả năng truyền cảm hứng cho người khác.",
+                "Bạn đang ở giai đoạn bùng nổ sáng tạo và hành động quyết liệt.",
+                "Ngọn lửa nội tại đang cháy rực, sẵn sàng chinh phục mục tiêu."
+            ],
+            reversed: [
+                "Ngọn lửa đam mê đang bị dập tắt hoặc bùng lên không kiểm soát.",
+                "Năng lượng lửa ngược dễ gây nóng vội, kiệt sức hoặc xung đột.",
+                "Bạn cần kiểm soát lửa nội tại để tránh hành động impulsively.",
+                "Đam mê đang bị kìm hãm – hãy tìm lại ngọn lửa thật sự của mình.",
+                "Lửa ngược nhắc bạn nghỉ ngơi và lấy lại sự cân bằng.",
+                "Có nguy cơ đốt cháy năng lượng quá mức dẫn đến kiệt sức.",
+                "Hãy cẩn thận với sự nóng nảy hoặc thiếu kiên nhẫn.",
+                "Lá bài cảnh báo lửa đang bị tắt – cần khơi lại đam mê.",
+                "Năng lượng lửa đảo ngược đòi hỏi bạn phải định hướng rõ ràng hơn.",
+                "Đây là lúc cần làm mát lửa để tránh cháy nổ không cần thiết."
+            ]
+        },
+        "Khí": {
+            upright: [
+                "Trí tuệ sắc bén, logic rõ ràng và giao tiếp đang rất tốt.",
+                "Năng lượng khí mang đến sự minh mẫn, ý tưởng mới và sự thật.",
+                "Bạn đang được hỗ trợ bởi gió của sự thay đổi và sáng tạo trí tuệ.",
+                "Lá bài nhấn mạnh khả năng suy nghĩ rõ ràng và đưa ra quyết định đúng.",
+                "Khí tượng trưng cho sự tự do, linh hoạt và tầm nhìn xa.",
+                "Gió đang thổi mang theo những thông điệp và cơ hội mới.",
+                "Trí óc bạn đang rất tỉnh táo và sẵn sàng đón nhận tri thức.",
+                "Năng lượng khí giúp bạn nhìn nhận vấn đề từ nhiều góc độ.",
+                "Đây là lúc lời nói và ý tưởng của bạn có sức mạnh lớn.",
+                "Gió của vũ trụ đang đẩy bạn tiến về phía chân lý và sáng tạo."
+            ],
+            reversed: [
+                "Suy nghĩ hỗn loạn, cần làm rõ sự thật và tháo gỡ nút thắt trong tâm trí.",
+                "Năng lượng khí ngược dễ gây hoang mang, tranh cãi hoặc thiếu tập trung.",
+                "Bạn cần dừng lại để sắp xếp lại suy nghĩ và tránh vội vàng.",
+                "Gió ngược nhắc bạn lắng nghe thay vì nói quá nhiều.",
+                "Có thể đang có sự lừa dối hoặc thông tin bị bóp méo.",
+                "Lá bài cảnh báo tâm trí đang bị gió xoáy làm rối loạn.",
+                "Hãy thở sâu để lấy lại sự rõ ràng và cân bằng.",
+                "Khí đảo ngược đòi hỏi bạn phải cắt bỏ suy nghĩ tiêu cực.",
+                "Đây là lúc cần làm chậm lại để gió trí tuệ thổi đúng hướng.",
+                "Năng lượng khí ngược nhắc bạn tìm lại sự minh mẫn nội tâm."
+            ]
+        },
+        "Đất": {
+            upright: [
+                "Thực tế, tiền bạc, công việc ổn định và sự thịnh vượng lâu dài.",
+                "Nền tảng vật chất đang vững chắc, bạn đang được hỗ trợ mạnh mẽ.",
+                "Lá bài mang năng lượng kiên cố, kiên nhẫn và xây dựng bền vững.",
+                "Đất giúp bạn tạo ra kết quả cụ thể và lâu dài.",
+                "Bạn đang được mời gọi chăm sóc nền tảng và tận hưởng thành quả.",
+                "Năng lượng đất mang lại sự an toàn, giàu có và sức khỏe dồi dào.",
+                "Đây là lúc bạn gặt hái những gì đã gieo trồng một cách vững vàng.",
+                "Đất tượng trưng cho sự kiên trì và khả năng hiện thực hóa.",
+                "Vũ trụ đang ban cho bạn nền tảng vững chắc để phát triển.",
+                "Bạn đang đứng trên nền đất màu mỡ, sẵn sàng cho sự thịnh vượng."
+            ],
+            reversed: [
+                "Nền tảng vật chất đang lung lay hoặc bạn đang quá bám víu vào an toàn.",
+                "Đất ngược nhắc bạn buông bỏ sự keo kiệt hoặc sợ mất mát.",
+                "Có thể đang có trì hoãn hoặc thiếu kiên nhẫn trong việc xây dựng.",
+                "Lá bài cảnh báo cần củng cố lại nền tảng trước khi tiến xa.",
+                "Bạn đang cần cân bằng giữa thực tế và sự linh hoạt.",
+                "Năng lượng đất đảo ngược dễ gây cảm giác thiếu thốn hoặc cứng nhắc.",
+                "Hãy buông bỏ những gì không còn phục vụ để đất mới có thể hình thành.",
+                "Đây là lúc cần xem xét lại cách quản lý tài chính và an toàn.",
+                "Đất ngược nhắc bạn đừng quá bám víu vào vật chất.",
+                "Bạn đang được mời gọi xây dựng lại nền tảng một cách khôn ngoan hơn."
+            ]
+        },
+        "Vũ Trụ": {
+            upright: [
+                "Bài học linh hồn lớn, kết nối trực tiếp với định mệnh vũ trụ.",
+                "Bạn đang được vũ trụ bao bọc và dẫn dắt bằng năng lượng vô hạn.",
+                "Lá bài mang đến sự toàn vẹn, bí ẩn và kết nối với vạn vật.",
+                "Vũ trụ đang thì thầm qua lá này rằng bạn đang đi đúng đường định mệnh.",
+                "Năng lượng vũ trụ giúp bạn nhìn xa hơn giới hạn của bản thân.",
+                "Đây là khoảnh khắc linh hồn bạn hòa quyện với nguồn sáng tạo lớn nhất.",
+                "Vũ trụ đang mở ra cánh cửa vô hạn cho hành trình của bạn.",
+                "Bạn là một phần của toàn thể – lá bài nhắc bạn nhớ điều đó.",
+                "Năng lượng vũ trụ mang lại sự chữa lành và thức tỉnh sâu sắc.",
+                "Đây là lúc bạn được mời gọi tin tưởng vào dòng chảy lớn của vũ trụ."
+            ],
+            reversed: [
+                "Bài học định mệnh đang bị kháng cự, cần buông bỏ để linh hồn tiến hóa.",
+                "Bạn đang cảm thấy nhỏ bé hoặc lạc lõng trước năng lượng vũ trụ.",
+                "Vũ trụ ngược nhắc bạn đừng sợ hãi điều chưa biết.",
+                "Có thể bạn đang kháng cự thay đổi lớn mà vũ trụ đang sắp đặt.",
+                "Lá bài cảnh báo cần mở lòng để nhận được sự hỗ trợ từ vũ trụ.",
+                "Năng lượng vũ trụ bị đảo ngược – hãy buông bỏ kiểm soát.",
+                "Đây là lúc bạn cần tin tưởng thay vì cố nắm giữ mọi thứ.",
+                "Vũ trụ đang mời bạn bước vào vùng tối để tìm thấy ánh sáng lớn.",
+                "Lá bài nhắc bạn đừng né tránh bài học định mệnh.",
+                "Hãy để vũ trụ dẫn dắt – đừng kháng cự dòng chảy vô hạn."
+            ]
+        }
+    };
+
+    // Lấy 1 trong 10 ý nghĩa ngẫu nhiên
+    const flavorGroup = elementFlavors[element] || elementFlavors["Vũ Trụ"];
+    const flavorArray = isReversed ? flavorGroup.reversed : flavorGroup.upright;
+    elementDesc = flavorArray[Math.floor(Math.random() * flavorArray.length)];
+
+    // ====================== 3. SỐ HỌC (giữ nguyên như lần sửa trước) ======================
+    if (card.id.includes("ace")) { 
+        number = "1"; numberMeaning = isReversed ? "Khởi đầu bị trì hoãn hoặc sai hướng" : "Tiềm năng thuần khiết – hạt giống của một chương mới"; 
+    }
     else if (card.id.includes("two")){ number = "2"; numberMeaning = isReversed ? "Mất cân bằng, do dự giữa hai lựa chọn" : "Sự kết nối, lựa chọn và hài hòa"; }
     else if (card.id.includes("three")){ number = "3"; numberMeaning = isReversed ? "Xung đột nhóm hoặc sáng tạo bị kìm hãm" : "Sự phát triển, vui vẻ và sáng tạo bùng nổ"; }
     else if (card.id.includes("four")){ number = "4"; numberMeaning = isReversed ? "Cứng nhắc, bế tắc, thiếu linh hoạt" : "Nền tảng vững chắc, ổn định lâu dài"; }
@@ -1537,13 +1684,52 @@ function getElementAndNumerology(card, isReversed) {
     else if (card.id.includes("eight")){ number = "8"; numberMeaning = isReversed ? "Kiệt sức, lặp lại vô ích" : "Sức mạnh vô hạn, kiên trì và thành tựu"; }
     else if (card.id.includes("nine")){ number = "9"; numberMeaning = isReversed ? "Mãn nguyện giả tạo hoặc kiêu ngạo" : "Gần hoàn thành, thành tựu cá nhân cao"; }
     else if (card.id.includes("ten")){ number = "10"; numberMeaning = isReversed ? "Chu kỳ kết thúc đau đớn" : "Hoàn thành một chu kỳ lớn, viên mãn"; }
-    else { number = "—"; numberMeaning = "Bài học định mệnh đặc biệt của linh hồn"; }
+    else {
+        const majorNumerology = {
+            "the-fool": { num: "0/22", meaning: isReversed ? "Bước nhảy mù quáng hoặc do dự" : "Khởi đầu hành trình linh hồn, niềm tin thuần khiết" },
+            "the-magician": { num: "1", meaning: isReversed ? "Thao túng hoặc thiếu tập trung" : "Sức mạnh sáng tạo, biến ý tưởng thành hiện thực" },
+            "the-high-priestess": { num: "2", meaning: isReversed ? "Bí mật bị che giấu" : "Trực giác sâu sắc và trí tuệ nội tâm" },
+            "the-empress": { num: "3", meaning: isReversed ? "Sáng tạo bị kìm hãm" : "Sự phong phú, nuôi dưỡng và sinh sôi" },
+            "the-emperor": { num: "4", meaning: isReversed ? "Thiếu kỷ luật" : "Cấu trúc, quyền lực và nền tảng vững chắc" },
+            "the-hierophant": { num: "5", meaning: isReversed ? "Phá vỡ quy tắc" : "Truyền thống và hướng dẫn tinh thần" },
+            "the-lovers": { num: "6", meaning: isReversed ? "Mất cân bằng tình cảm" : "Lựa chọn định mệnh và sự hòa hợp" },
+            "the-chariot": { num: "7", meaning: isReversed ? "Mất kiểm soát" : "Ý chí mạnh mẽ và chiến thắng" },
+            "strength": { num: "8", meaning: isReversed ? "Yếu đuối nội tâm" : "Sức mạnh dịu dàng và kiên nhẫn" },
+            "the-hermit": { num: "9", meaning: isReversed ? "Cô lập quá mức" : "Suy tư nội tâm và tìm kiếm chân lý" },
+            "wheel-of-fortune": { num: "10", meaning: isReversed ? "Chu kỳ xấu" : "Vận mệnh và thay đổi tích cực" },
+            "justice": { num: "11", meaning: isReversed ? "Bất công" : "Công bằng và sự thật" },
+            "the-hanged-man": { num: "12", meaning: isReversed ? "Bế tắc" : "Buông bỏ và góc nhìn mới" },
+            "death": { num: "13", meaning: isReversed ? "Kháng cự thay đổi" : "Kết thúc và tái sinh" },
+            "temperance": { num: "14", meaning: isReversed ? "Mất cân bằng" : "Hài hòa và điều hòa" },
+            "the-devil": { num: "15", meaning: isReversed ? "Giải thoát" : "Xiềng xích và dục vọng" },
+            "the-tower": { num: "16", meaning: isReversed ? "Tránh sụp đổ" : "Sụp đổ đột ngột để tái tạo" },
+            "the-star": { num: "17", meaning: isReversed ? "Mất hy vọng" : "Hy vọng, chữa lành và niềm tin" },
+            "the-moon": { num: "18", meaning: isReversed ? "Ảo tưởng tan vỡ" : "Trực giác và ảo ảnh" },
+            "the-sun": { num: "19", meaning: isReversed ? "Niềm vui bị che khuất" : "Thành công rực rỡ và hạnh phúc" },
+            "judgement": { num: "20", meaning: isReversed ? "Tự phán xét" : "Tỉnh thức và tái sinh" },
+            "the-world": { num: "21", meaning: isReversed ? "Kết thúc dang dở" : "Hoàn thành và toàn vẹn" }
+        };
 
-    return { 
-        element: `${element} ${elementEmoji}`, 
-        elementDesc, 
-        number, 
-        numberMeaning 
+        if (isSpecialCard) {
+            if (currentDeckSize >= 79) {
+                number = "∞";
+                numberMeaning = isReversed ? "Sợ hãi điều chưa biết / mất kết nối" : "Bí ẩn vô hạn & toàn vẹn vũ trụ";
+            } else {
+                number = "—";
+                numberMeaning = "Bài học định mệnh đặc biệt của linh hồn";
+            }
+        } else {
+            const data = majorNumerology[card.id] || { num: "—", meaning: "Bài học định mệnh đặc biệt của linh hồn" };
+            number = data.num;
+            numberMeaning = data.meaning;
+        }
+    }
+
+    return {
+        element: `${element} ${elementEmoji}`,
+        elementDesc,
+        number,
+        numberMeaning
     };
 }
 
