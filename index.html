@@ -8,12 +8,14 @@
 
     <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Quicksand:wght@300;500;700&display=swap');
-        :root {
-            --gold: #d4af37;
-            --dark-purple: #1a0b2e;
-            --neon-purple: #9d4edd;
-            --bg-color: #0d0514;
-        }
+      :root {
+    --gold: #d4af37;
+    --dark-purple: #1a0b2e;
+    --neon-purple: #9d4edd;
+    --bg-color: #0d0514;
+    --glow-gold: 0 0 20px rgba(212, 175, 55, 0.6);
+    --glow-purple: 0 0 25px rgba(157, 78, 221, 0.7);
+}
         body { margin: 0; min-height: 100vh; background: radial-gradient(circle at top, #2a114d 0%, var(--bg-color) 100%); font-family: 'Quicksand', sans-serif; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; background-image: radial-gradient(1px 1px at 20px 30px, #eee, rgba(0,0,0,0)); background-repeat: repeat; background-size: 200px 200px; opacity: 0.5; }
         h1 { font-family: 'Cinzel Decorative', cursive; color: var(--gold); text-shadow: 0 0 15px var(--neon-purple); text-align: center; margin-bottom: 10px; }
@@ -171,6 +173,25 @@
         .modal-content { background: #1a0b2e; border: 2px solid var(--gold); border-radius: 15px; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; padding: 25px; }
         .history-item { margin-bottom: 15px; padding: 15px; background: rgba(157,78,221,0.1); border-radius: 10px; border: 1px solid var(--gold); cursor: pointer; transition: all 0.3s; }
         .history-item:hover { background: rgba(157,78,221,0.25); transform: translateY(-2px); }
+        .deck-option {
+    display: block;
+    padding: 14px 18px;
+    margin: 8px 0;
+    background: rgba(26, 11, 46, 0.6);
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.deck-option:hover {
+    background: rgba(157, 78, 221, 0.2);
+    border-color: var(--neon-purple);
+}
+
+.deck-option input[type="radio"] {
+    margin-right: 12px;
+}
     </style>
 </head>
 <body>
@@ -183,6 +204,7 @@
         <button class="menu-btn" onclick="setSpreadType('career')">Sự Nghiệp (4 Lá)</button>
         <button class="menu-btn" onclick="setSpreadType('journey')">Hành Trình (5 Lá)</button>
         <button class="menu-btn" onclick="showHistory()">📖 Lịch sử trải bài</button>
+        <button class="menu-btn" onclick="showSettings()">⚙️ Cài đặt</button>
     </div>
     <div class="controls">
         <button class="draw-btn" id="startBtn" onclick="startSpread()">BẮT ĐẦU XÁO BÀI</button>
@@ -216,6 +238,35 @@
         </div>
     </div>
 
+    <!-- Modal Cài đặt -->
+<div id="settingsModal" class="modal">
+    <div class="modal-content" style="max-width: 420px;">
+        <h2 style="color:var(--gold); text-align:center;">⚙️ Cài Đặt Bộ Bài</h2>
+        
+        <div style="margin: 25px 0; font-size: 1.05rem;">
+            <p style="margin-bottom: 15px; color:#ddd;">Chọn số lượng lá bài Tarot:</p>
+            
+            <label class="deck-option">
+                <input type="radio" name="deckSize" value="78" checked onchange="changeDeckSize(78)">
+                <span>78 lá (Bộ chuẩn cổ điển)</span>
+            </label>
+            
+            <label class="deck-option">
+                <input type="radio" name="deckSize" value="79" onchange="changeDeckSize(79)">
+                <span>79 lá (Thêm 1 lá đặc biệt)</span>
+            </label>
+            
+            <label class="deck-option">
+                <input type="radio" name="deckSize" value="80" onchange="changeDeckSize(80)">
+                <span>80 lá (Thêm 2 lá đặc biệt)</span>
+            </label>
+        </div>
+
+        <div style="text-align:center; margin-top: 30px;">
+            <button class="menu-btn" onclick="hideSettings()" style="padding: 12px 30px;">Đóng</button>
+        </div>
+    </div>
+</div>
     <script>
         // ====================== BỘ BÀI TAROT 78 LÁ ======================
         const deck = [
@@ -457,88 +508,678 @@
               reversedMeaning: "Bạn đang bỏ bê bản thân hoặc thiếu cân bằng." },
             { id: "king-of-pentacles", name: "King of Pentacles", emoji: "👑🪙", reversedEmoji: "👑🪙", keyword: "thành công vật chất và ổn định", reversedKeyword: "tham lam, bất ổn tài chính hoặc lạm dụng quyền lực",
               meaning: "Người đàn ông thành đạt, đáng tin cậy.",
-              reversedMeaning: "Thành công đang bị đe dọa bởi tham lam hoặc bất ổn." }
+              reversedMeaning: "Thành công đang bị đe dọa bởi tham lam hoặc bất ổn." },
+              { id: "the-unknown", name: "The Unknown", emoji: "🌌", reversedEmoji: "🌌",
+      keyword: "bí ẩn, vô hạn và điều chưa biết", reversedKeyword: "sợ hãi điều chưa biết, né tránh",
+      meaning: "Lá bài đại diện cho những điều nằm ngoài kiến thức hiện tại của bạn. Đây là lời mời gọi dũng cảm bước vào vùng tối của vũ trụ và linh hồn.",
+      reversedMeaning: "Bạn đang né tránh những điều chưa biết hoặc sợ hãi sự thay đổi. Hãy tin rằng vũ trụ luôn dẫn dắt bạn." },
+
+    { id: "the-cosmos", name: "The Cosmos", emoji: "🌠", reversedEmoji: "🌠",
+      keyword: "toàn vẹn vũ trụ, kết nối vạn vật", reversedKeyword: "mất kết nối, cảm giác nhỏ bé",
+      meaning: "Bạn là một phần của vũ trụ bao la. Lá bài nhắc nhở rằng mọi thứ đều liên kết với nhau và bạn đang được hỗ trợ bởi năng lượng vũ trụ.",
+      reversedMeaning: "Bạn đang cảm thấy lạc lõng hoặc nhỏ bé so với thế giới. Hãy nhớ rằng bạn chính là một phần của toàn thể vũ trụ." }
         ];
 
 
 const contextualMeanings = {
-    "ace-of-pentacles": {
-        love: { upright: "Một cơ hội tình cảm rất thực tế và bền vững đang đến – mối quan hệ mang lại sự ổn định, an toàn và phát triển lâu dài.", reversed: "Cơ hội tình cảm bị bỏ lỡ hoặc mối quan hệ thiếu nền tảng vững chắc." },
-        career: { upright: "Cơ hội vàng về tiền bạc, công việc hoặc sức khỏe.", reversed: "Cơ hội bị bỏ lỡ hoặc mất mát tài chính." },
-        journey: { upright: "Bước khởi đầu mới về vật chất và tinh thần.", reversed: "Cần chú ý đến nền tảng thực tế." }
+    // ====================== ẨN CHÍNH (22 lá) ======================
+    "the-fool": {
+        love: { upright: "Một khởi đầu tình cảm đầy ngây thơ, phiêu lưu và tin tưởng tuyệt đối vào người ấy. Linh hồn bạn đang sẵn sàng nhảy vào một mối liên kết mới.", reversed: "Liều lĩnh cảm xúc, thiếu chuẩn bị, dễ bị tổn thương hoặc chạy theo ảo mộng không thực tế." },
+        career: { upright: "Cơ hội mới mẻ, dám bước ra vùng an toàn để bắt đầu hành trình sự nghiệp đầy bất ngờ.", reversed: "Hành động impulsively, thiếu kế hoạch rõ ràng, dễ thất bại vì thiếu nền tảng." },
+        journey: { upright: "Hành trình linh hồn bắt đầu với lòng tin thuần khiết vào vũ trụ, sẵn sàng đón nhận định mệnh.", reversed: "Do dự, sợ hãi thay đổi, đứng yên một chỗ không dám tiến bước." }
     },
-    "three-of-pentacles": {
-        love: { upright: "Hai bạn đang cùng xây dựng mối quan hệ một cách có hệ thống, học hỏi lẫn nhau và tạo nền tảng lâu dài.", reversed: "Mối quan hệ thiếu sự phối hợp, một bên không muốn đầu tư công sức chung." },
-        career: { upright: "Thành công nhờ hợp tác nhóm và kỹ năng chuyên môn.", reversed: "Thiếu hợp tác hoặc kỹ năng chưa đủ." },
-        journey: { upright: "Bạn đang hoàn thiện bản thân qua sự hợp tác với người khác.", reversed: "Cần tự lập hơn." }
+    "the-magician": {
+        love: { upright: "Bạn đang sở hữu tất cả sức hút và khả năng để tạo ra một tình yêu đẹp đẽ, mãnh liệt.", reversed: "Thao túng cảm xúc, lời nói hoa mỹ nhưng thiếu chân thành." },
+        career: { upright: "Sức mạnh sáng tạo và kỹ năng đang ở đỉnh cao, mọi ý tưởng đều có thể thành hiện thực.", reversed: "Trì hoãn, lạm dụng quyền lực hoặc dùng tài năng để lừa dối." },
+        journey: { upright: "Bạn đang làm chủ năng lực linh hồn, biến khát khao thành hiện thực trên con đường thức tỉnh.", reversed: "Tự lừa dối bản thân, chưa khai thác hết tiềm năng thiêng liêng." }
     },
-    "four-of-pentacles": {
-        love: { upright: "Bạn đang muốn giữ chặt mối quan hệ, sợ mất. Cần cân bằng giữa an toàn và mở lòng.", reversed: "Bạn hoặc đối phương đang kiểm soát, keo kiệt tình cảm hoặc sợ cam kết sâu." },
-        career: { upright: "Giữ chặt tài chính và an toàn.", reversed: "Đã đến lúc buông bỏ và chia sẻ." },
-        journey: { upright: "Giữ gìn năng lượng nội tại.", reversed: "Cần buông bỏ để tiến bước." }
+    "the-high-priestess": {
+        love: { upright: "Trực giác đang mách bảo bạn về một tình yêu sâu sắc, bí ẩn và định mệnh.", reversed: "Bí mật bị che giấu, thiếu tin tưởng vào tiếng nói nội tâm." },
+        career: { upright: "Lắng nghe trực giác để đưa ra quyết định sáng suốt, những điều chưa nhìn thấy đang dẫn dắt bạn.", reversed: "Bỏ qua linh cảm, bị lừa bởi vẻ bề ngoài." },
+        journey: { upright: "Hành trình đi sâu vào tầng tiềm thức và bí mật vũ trụ.", reversed: "Cô lập cảm xúc, không dám đối diện sự thật ẩn giấu." }
     },
-    "five-of-pentacles": {
-        love: { upright: "Cảm giác cô đơn hoặc thiếu thốn trong tình cảm dù đang bên nhau.", reversed: "Sự giúp đỡ và chữa lành tình cảm đang đến." },
-        career: { upright: "Khó khăn tài chính hoặc cảm giác bị bỏ rơi.", reversed: "Sự giúp đỡ đang đến." },
-        journey: { upright: "Giai đoạn thử thách vật chất.", reversed: "Bạn không cô đơn trên hành trình." }
+    "the-empress": {
+        love: { upright: "Tình yêu dồi dào, nuôi dưỡng, đam mê và đầy sáng tạo. Cảm giác được chăm sóc và trân trọng.", reversed: "Phụ thuộc quá mức, sáng tạo cảm xúc bị kìm hãm hoặc bế tắc." },
+        career: { upright: "Thời kỳ phong phú, sáng tạo bùng nổ, thành công đến một cách tự nhiên.", reversed: "Thiếu chăm sóc bản thân, năng lượng sáng tạo bị tắc nghẽn." },
+        journey: { upright: "Kết nối sâu sắc với năng lượng nữ tính thiêng liêng và sự phong phú của vũ trụ.", reversed: "Mất cân bằng nội tại, cảm giác trống rỗng và thiếu nuôi dưỡng tinh thần." }
     },
-    "nine-of-pentacles": {
-        love: { upright: "Tình yêu độc lập, tự do và sung túc. Bạn hạnh phúc với chính mình trước khi bước vào tình yêu.", reversed: "Cô lập hoặc phụ thuộc trong tình cảm." },
-        career: { upright: "Thành công độc lập và sung túc.", reversed: "Cô lập hoặc mất mát tài chính." },
-        journey: { upright: "Đạt được sự tự do nội tại.", reversed: "Cần cân bằng." }
+    "the-emperor": {
+        love: { upright: "Mối quan hệ ổn định, có cấu trúc, trách nhiệm và cảm giác an toàn lâu dài.", reversed: "Kiểm soát, độc đoán hoặc thiếu kỷ luật trong tình cảm." },
+        career: { upright: "Xây dựng nền tảng vững chắc, lãnh đạo mạnh mẽ, đạt được quyền lực và thành tựu.", reversed: "Bất ổn quyền lực, thiếu cấu trúc hoặc lạm dụng quyền hành." },
+        journey: { upright: "Xây dựng kỷ luật tinh thần và nền tảng vững chắc cho hành trình linh hồn.", reversed: "Mất cân bằng giữa quyền lực và lòng trắc ẩn." }
     },
-    "ten-of-pentacles": {
-        love: { upright: "Hạnh phúc gia đình lâu dài, ổn định và di sản tình cảm.", reversed: "Xung đột gia đình hoặc tan vỡ di sản tình cảm." },
-        career: { upright: "Thịnh vượng lâu dài và di sản.", reversed: "Mất mát tài chính gia đình." },
-        journey: { upright: "Hoàn thành chu kỳ thịnh vượng.", reversed: "Cần chữa lành di sản." }
+    "the-hierophant": {
+        love: { upright: "Tình yêu truyền thống, có cam kết sâu sắc và hướng dẫn tinh thần.", reversed: "Phá vỡ quy tắc cũ, nổi loạn trong tình cảm hoặc mù quáng theo đám đông." },
+        career: { upright: "Tìm kiếm lời khuyên từ mentor, tuân theo quy trình đã được kiểm chứng.", reversed: "Nổi loạn, phá bỏ quy tắc để tìm con đường riêng." },
+        journey: { upright: "Kết nối với truyền thống tâm linh và thầy hướng dẫn từ vũ trụ.", reversed: "Cần phá vỡ niềm tin cũ để thức tỉnh." }
     },
-    "knight-of-pentacles": {
-        love: { upright: "Người chín chắn, đáng tin cậy, yêu chậm nhưng chắc chắn và cam kết lâu dài.", reversed: "Cứng nhắc, thiếu tiến triển hoặc nhàm chán trong tình cảm." },
-        career: { upright: "Chăm chỉ, đáng tin cậy.", reversed: "Lười biếng hoặc cứng nhắc." },
-        journey: { upright: "Tiến bộ chậm nhưng vững chắc.", reversed: "Cần linh hoạt hơn." }
+    "the-lovers": {
+        love: { upright: "Tình yêu định mệnh, lựa chọn từ trái tim, gắn kết linh hồn sâu sắc.", reversed: "Mất cân bằng, lựa chọn sai lầm hoặc chia ly đau đớn." },
+        career: { upright: "Hợp tác quan trọng, lựa chọn nghề nghiệp phù hợp với giá trị cốt lõi.", reversed: "Xung đột giá trị, quyết định sai trong công việc." },
+        journey: { upright: "Lựa chọn linh hồn định mệnh giữa hai con đường.", reversed: "Mất hài hòa giữa lý trí và trái tim." }
     },
-    "queen-of-pentacles": {
-        love: { upright: "Người phụ nữ chu đáo, thực tế, nuôi dưỡng tình yêu bằng hành động cụ thể.", reversed: "Bỏ bê bản thân hoặc tham lam tình cảm." },
-        career: { upright: "Chăm sóc thực tế và thịnh vượng.", reversed: "Bỏ bê hoặc thiếu cân bằng." },
-        journey: { upright: "Nuôi dưỡng bản thân trên hành trình.", reversed: "Cần tự chăm sóc." }
+    "the-chariot": {
+        love: { upright: "Tình yêu tiến về phía trước với quyết tâm mạnh mẽ, vượt qua mọi thử thách.", reversed: "Mất kiểm soát cảm xúc, hướng đi sai trong mối quan hệ." },
+        career: { upright: "Chiến thắng nhờ ý chí sắt đá, tiến xa trong sự nghiệp.", reversed: "Hướng đi sai, mất kiểm soát dự án." },
+        journey: { upright: "Hành trình linh hồn với ý chí kiên cường, chinh phục thử thách.", reversed: "Bị cảm xúc chi phối, lạc hướng." }
     },
-    "king-of-pentacles": {
-        love: { upright: "Người đàn ông thành đạt, ổn định, mang lại cảm giác an toàn tuyệt đối trong tình yêu.", reversed: "Tham lam hoặc bất ổn tài chính ảnh hưởng đến tình cảm." },
-        career: { upright: "Thành công vật chất và ổn định.", reversed: "Tham lam hoặc bất ổn." },
-        journey: { upright: "Đạt được sự ổn định nội tại.", reversed: "Cần cân bằng vật chất - tinh thần." }
+    "strength": {
+        love: { upright: "Sức mạnh dịu dàng của tình yêu, kiên nhẫn và dũng cảm đối mặt thử thách.", reversed: "Yếu đuối nội tâm, thiếu tự tin trong tình cảm." },
+        career: { upright: "Sức mạnh nội tại giúp bạn vượt qua áp lực và thử thách lớn.", reversed: "Mất kiên nhẫn, tự nghi ngờ bản thân." },
+        journey: { upright: "Sức mạnh tâm linh từ lòng dũng cảm và kiên nhẫn.", reversed: "Thiếu tự tin nội tại, dễ bị cảm xúc chế ngự." }
     },
-    "three-of-swords": {
-        love: { upright: "Nỗi đau xé lòng, phản bội hoặc chia tay trong tình cảm.", reversed: "Chữa lành và tha thứ sau tổn thương tình cảm." },
-        career: { upright: "Nỗi đau xé lòng.", reversed: "Chữa lành." },
-        journey: { upright: "Bài học từ nỗi đau.", reversed: "Tha thứ và tiến bước." }
+    "the-hermit": {
+        love: { upright: "Thời gian cần thiết để chiêm nghiệm, tìm kiếm tình yêu chân thật từ bên trong.", reversed: "Cô lập quá mức, tránh né mối quan hệ." },
+        career: { upright: "Rút lui để suy tư, tìm ra con đường sự nghiệp đúng đắn.", reversed: "Cô đơn quá mức, thiếu hướng dẫn." },
+        journey: { upright: "Hành trình nội tâm sâu lắng, tìm ánh sáng từ chính linh hồn.", reversed: "Tránh né sự thật, cô lập bản thân." }
     },
-    "ten-of-swords": {
-        love: { upright: "Kết thúc đau đớn của một mối quan hệ (chia tay, kiệt sức cảm xúc). Đây là đáy vực.", reversed: "Bạn đang bắt đầu hồi phục sau tổn thương tình cảm." },
-        career: { upright: "Kết thúc đau đớn và đáy vực.", reversed: "Tái sinh." },
-        journey: { upright: "Kết thúc một chu kỳ đau thương.", reversed: "Phục hồi." }
+    "wheel-of-fortune": {
+        love: { upright: "Vận mệnh đưa hai linh hồn gặp nhau, chu kỳ tình yêu thay đổi tích cực.", reversed: "Chu kỳ xấu, vận rủi trong tình cảm." },
+        career: { upright: "Thay đổi lớn, cơ hội đến từ vận mệnh.", reversed: "Vận rủi, kháng cự thay đổi." },
+        journey: { upright: "Bánh xe định mệnh xoay chuyển, bài học từ chu kỳ vũ trụ.", reversed: "Kẹt trong chu kỳ tiêu cực." }
     },
-    "eight-of-swords": {
-        love: { upright: "Cảm giác bị kẹt trong mối quan hệ, tự giam cầm mình bởi sợ hãi.", reversed: "Giải thoát khỏi mối quan hệ độc hại hoặc suy nghĩ tiêu cực." },
-        career: { upright: "Cảm giác bị kẹt.", reversed: "Tự do." },
-        journey: { upright: "Tự giam cầm bởi suy nghĩ.", reversed: "Giải thoát." }
+    "justice": {
+        love: { upright: "Công bằng và sự thật trong tình yêu, hậu quả của hành động trước đây.", reversed: "Bất công, tránh né trách nhiệm trong mối quan hệ." },
+        career: { upright: "Công lý được thực thi, thành quả xứng đáng với nỗ lực.", reversed: "Sai lầm, tránh né trách nhiệm." },
+        journey: { upright: "Cân bằng nhân quả, bài học công bằng từ vũ trụ.", reversed: "Bất công nội tại, tự phán xét." }
     },
-    "seven-of-wands": {
-        love: { upright: "Bạn phải đứng lên bảo vệ mối quan hệ trước áp lực từ bên ngoài.", reversed: "Kiệt sức vì phải chiến đấu liên tục trong tình yêu." },
-        career: { upright: "Bảo vệ thành quả.", reversed: "Kiệt sức." },
-        journey: { upright: "Kiên cường trước thử thách.", reversed: "Cần nghỉ ngơi." }
-    },
-    "the-tower": {
-        love: { upright: "Sụp đổ đột ngột của mối quan hệ cũ để xây dựng lại chân thành hơn.", reversed: "Khủng hoảng kéo dài trong tình cảm." },
-        career: { upright: "Sụp đổ đột ngột.", reversed: "Tránh né sụp đổ." },
-        journey: { upright: "Phá hủy để tái sinh.", reversed: "Kháng cự thay đổi." }
+    "the-hanged-man": {
+        love: { upright: "Buông bỏ để có góc nhìn mới, hy sinh vì tình yêu sâu sắc.", reversed: "Bế tắc, hy sinh vô ích, không chịu buông tay." },
+        career: { upright: "Tạm dừng để nhìn nhận lại, góc nhìn mới mang lại đột phá.", reversed: "Kẹt cứng, không chịu thay đổi." },
+        journey: { upright: "Hy sinh để thức tỉnh, nhìn nhận sự việc từ góc độ cao hơn.", reversed: "Kháng cự buông bỏ, bế tắc linh hồn." }
     },
     "death": {
-        love: { upright: "Kết thúc một giai đoạn tình cảm để nhường chỗ cho tình yêu mới sâu sắc hơn.", reversed: "Kháng cự thay đổi trong mối quan hệ." },
-        career: { upright: "Kết thúc và chuyển hóa.", reversed: "Kháng cự thay đổi." },
-        journey: { upright: "Chuyển hóa linh hồn.", reversed: "Sợ thay đổi." }
+        love: { upright: "Kết thúc giai đoạn cũ để tình yêu mới sâu sắc và chân thành hơn.", reversed: "Kháng cự thay đổi, mối quan hệ kéo dài đau khổ." },
+        career: { upright: "Chuyển hóa hoàn toàn, kết thúc để mở ra cánh cửa mới.", reversed: "Sợ thay đổi, bám víu công việc cũ." },
+        journey: { upright: "Tái sinh linh hồn mạnh mẽ, chuyển hóa sâu sắc.", reversed: "Kẹt trong chu kỳ cũ, sợ lột xác." }
+    },
+    "temperance": {
+        love: { upright: "Cân bằng cảm xúc, hài hòa giữa hai trái tim.", reversed: "Mất cân bằng, cực đoan trong tình cảm." },
+        career: { upright: "Điều hòa công việc và cuộc sống, kiên nhẫn mang lại thành công.", reversed: "Xung đột nội tâm, mất kiểm soát." },
+        journey: { upright: "Hài hòa giữa vật chất và tinh thần, tìm sự cân bằng thiêng liêng.", reversed: "Cực đoan, mất cân bằng năng lượng." }
+    },
+    "the-devil": {
+        love: { upright: "Bị ràng buộc bởi dục vọng hoặc mối quan hệ độc hại.", reversed: "Giải thoát khỏi xiềng xích, tự do tình cảm." },
+        career: { upright: "Tham lam, nghiện công việc hoặc sợ hãi mất kiểm soát.", reversed: "Phá bỏ ràng buộc, tìm lại tự do." },
+        journey: { upright: "Đối mặt với bóng tối nội tâm để giải phóng.", reversed: "Giải thoát khỏi nghiệp chướng cũ." }
+    },
+    "the-tower": {
+        love: { upright: "Sụp đổ đột ngột để xây dựng tình yêu chân thành hơn.", reversed: "Khủng hoảng kéo dài, tránh né sự thật." },
+        career: { upright: "Thay đổi lớn, phá hủy cũ để tái tạo.", reversed: "Trì hoãn sụp đổ cần thiết." },
+        journey: { upright: "Phá vỡ ảo tưởng để thức tỉnh linh hồn.", reversed: "Kháng cự sự thật đau đớn." }
+    },
+    "the-star": {
+        love: { upright: "Hy vọng, chữa lành và niềm tin vào tình yêu đích thực.", reversed: "Mất hy vọng, kiệt sức cảm xúc." },
+        career: { upright: "Ánh sáng hy vọng sau khó khăn, chữa lành và thành công.", reversed: "Nghi ngờ, thiếu động lực." },
+        journey: { upright: "Ánh sao dẫn lối linh hồn sau giông bão.", reversed: "Mất niềm tin vào hành trình." }
+    },
+    "the-moon": {
+        love: { upright: "Ảo ảnh và trực giác trong tình yêu, cần tin vào tiếng lòng.", reversed: "Lừa dối, ảo tưởng tan vỡ." },
+        career: { upright: "Thời kỳ mơ hồ, hãy tin trực giác.", reversed: "Hoang mang, bị lừa dối." },
+        journey: { upright: "Hành trình qua bóng tối để tìm ánh sáng thực sự.", reversed: "Ảo tưởng che lấp sự thật." }
+    },
+    "the-sun": {
+        love: { upright: "Hạnh phúc rực rỡ, niềm vui và thành công trong tình yêu.", reversed: "Niềm vui tạm thời bị che khuất." },
+        career: { upright: "Thành công rực rỡ, năng lượng tích cực.", reversed: "Thành công bị trì hoãn." },
+        journey: { upright: "Ánh sáng linh hồn tỏa sáng, đạt được toàn vẹn.", reversed: "Tạm thời tối tăm trong hành trình." }
+    },
+    "judgement": {
+        love: { upright: "Tỉnh thức, tha thứ và tái sinh trong tình yêu.", reversed: "Tự phán xét, trì hoãn thay đổi." },
+        career: { upright: "Lời gọi thức tỉnh, thay đổi lớn theo định mệnh.", reversed: "Hối tiếc, trì hoãn quyết định." },
+        journey: { upright: "Thức tỉnh linh hồn, tái sinh mạnh mẽ.", reversed: "Tự trách móc, không chịu tha thứ." }
+    },
+    "the-world": {
+        love: { upright: "Hoàn thành chu kỳ tình yêu, cảm giác viên mãn và hạnh phúc.", reversed: "Kết thúc dang dở, thiếu hoàn thiện." },
+        career: { upright: "Thành tựu lớn, hoàn tất mục tiêu.", reversed: "Vòng lặp, chưa hoàn thành." },
+        journey: { upright: "Toàn vẹn linh hồn, hoàn tất một chu kỳ lớn.", reversed: "Còn bài học cuối cùng chưa học." }
+    },
+
+    // ====================== CỐC (Cups) ======================
+    "ace-of-cups": { love: { upright: "Tình yêu mới tuôn trào, cảm xúc dâng trào và khởi đầu sâu sắc.", reversed: "Cảm xúc bị tắc nghẽn, đóng cửa trái tim." }, career: { upright: "Cơ hội cảm hứng sáng tạo, khởi đầu mới về cảm xúc công việc.", reversed: "Mất kết nối cảm xúc với công việc." }, journey: { upright: "Dòng chảy tình yêu vũ trụ mở ra.", reversed: "Cảm xúc bị kìm hãm." }},
+    "two-of-cups": { love: { upright: "Kết nối sâu sắc, tình yêu đôi lứa hài hòa.", reversed: "Mất cân bằng mối quan hệ." }, career: { upright: "Hợp tác ăn ý.", reversed: "Xung đột đối tác." }, journey: { upright: "Gặp gỡ linh hồn tri kỷ.", reversed: "Chia ly nội tâm." }},
+    "three-of-cups": { love: { upright: "Vui vẻ, tình bạn và kỷ niệm đẹp trong tình yêu.", reversed: "Xung đột nhóm bạn." }, career: { upright: "Ăn mừng thành công nhóm.", reversed: "Cô lập trong công việc." }, journey: { upright: "Sum vầy linh hồn.", reversed: "Cô đơn trên hành trình." }},
+    "four-of-cups": { love: { upright: "Thờ ơ với cơ hội tình cảm, cần mở lòng.", reversed: "Sẵn sàng đón nhận tình yêu mới." }, career: { upright: "Bỏ lỡ cơ hội.", reversed: "Thoát khỏi thờ ơ." }, journey: { upright: "Suy tư sâu lắng.", reversed: "Mở mắt với cơ hội vũ trụ." }},
+    "five-of-cups": { love: { upright: "Nỗi đau mất mát, nhưng vẫn còn hy vọng.", reversed: "Chữa lành và nhìn thấy những gì còn lại." }, career: { upright: "Thất vọng.", reversed: "Hy vọng trở lại." }, journey: { upright: "Bài học từ mất mát.", reversed: "Chấp nhận và tiến bước." }},
+    "six-of-cups": { love: { upright: "Hoài niệm đẹp, người cũ trở lại hoặc tình yêu trong sáng.", reversed: "Bám víu quá khứ." }, career: { upright: "Ký ức giúp đỡ.", reversed: "Không trưởng thành." }, journey: { upright: "Kết nối kiếp trước.", reversed: "Buông bỏ ký ức cũ." }},
+    "seven-of-cups": { love: { upright: "Nhiều lựa chọn tình cảm, cần phân biệt thực-ảo.", reversed: "Lựa chọn rõ ràng." }, career: { upright: "Ảo mộng công việc.", reversed: "Tỉnh táo." }, journey: { upright: "Lựa chọn linh hồn.", reversed: "Thực tế hơn." }},
+    "eight-of-cups": { love: { upright: "Rời bỏ để tìm tình yêu ý nghĩa hơn.", reversed: "Sợ thay đổi." }, career: { upright: "Bước đi tìm sứ mệnh.", reversed: "Quay lại." }, journey: { upright: "Tìm kiếm ý nghĩa sâu.", reversed: "Bám víu." }},
+    "nine-of-cups": { love: { upright: "Điều ước tình yêu thành hiện thực, mãn nguyện.", reversed: "Mãn nguyện giả tạo." }, career: { upright: "Thành công cảm xúc.", reversed: "Kiêu ngạo." }, journey: { upright: "Mãn nguyện linh hồn.", reversed: "Chưa đủ." }},
+    "ten-of-cups": { love: { upright: "Hạnh phúc gia đình viên mãn.", reversed: "Gia đình bất hòa." }, career: { upright: "Thịnh vượng cảm xúc.", reversed: "Tan vỡ." }, journey: { upright: "Hạnh phúc toàn vẹn.", reversed: "Ảo mộng." }},
+    "page-of-cups": { love: { upright: "Tin nhắn tình cảm ngọt ngào.", reversed: "Tin xấu tình cảm." }, career: { upright: "Ý tưởng sáng tạo.", reversed: "Thiếu trưởng thành." }, journey: { upright: "Tin từ linh hồn.", reversed: "Thiếu nhạy cảm." }},
+    "knight-of-cups": { love: { upright: "Người lãng mạn, lời mời tình cảm.", reversed: "Lãng mạn giả tạo." }, career: { upright: "Đề nghị cảm xúc.", reversed: "Thất hứa." }, journey: { upright: "Hiệp sĩ cảm xúc.", reversed: "Lừa dối." }},
+    "queen-of-cups": { love: { upright: "Trắc ẩn, trực giác mạnh mẽ trong tình yêu.", reversed: "Trắc ẩn quá mức, kiệt sức." }, career: { upright: "Người phụ nữ nhạy cảm.", reversed: "Phụ thuộc." }, journey: { upright: "Nữ hoàng trái tim.", reversed: "Mất cân bằng." }},
+    "king-of-cups": { love: { upright: "Trưởng thành cảm xúc, hỗ trợ sâu sắc.", reversed: "Cảm xúc bất ổn." }, career: { upright: "Lãnh đạo bằng trái tim.", reversed: "Thao túng." }, journey: { upright: "Vua cảm xúc cân bằng.", reversed: "Lạnh lùng." }},
+
+    // ====================== GẬY (Wands) ======================
+    "ace-of-wands": { love: { upright: "Đam mê mới bùng nổ trong tình yêu.", reversed: "Thiếu đam mê." }, career: { upright: "Năng lượng sáng tạo bùng nổ.", reversed: "Năng lượng tiêu cực." }, journey: { upright: "Ngọn lửa linh hồn bùng lên.", reversed: "Đam mê bị dập tắt." }},
+    "two-of-wands": { love: { upright: "Lập kế hoạch tương lai cùng nhau.", reversed: "Do dự trong tình cảm." }, career: { upright: "Lập kế hoạch dài hạn.", reversed: "Thiếu tầm nhìn." }, journey: { upright: "Chọn hướng đi linh hồn.", reversed: "Bất an." }},
+    "three-of-wands": { love: { upright: "Tiến triển tình cảm, cơ hội từ xa.", reversed: "Trì hoãn." }, career: { upright: "Mở rộng kinh doanh.", reversed: "Cơ hội bị bỏ lỡ." }, journey: { upright: "Nhìn xa tương lai.", reversed: "Chờ đợi vô vọng." }},
+    "four-of-wands": { love: { upright: "Ổn định, ăn mừng tình yêu.", reversed: "Bất ổn nhà cửa." }, career: { upright: "Thành công gia đình.", reversed: "Xung đột." }, journey: { upright: "Nhà tâm linh.", reversed: "Tạm thời." }},
+    "five-of-wands": { love: { upright: "Cạnh tranh lành mạnh trong tình yêu.", reversed: "Xung đột leo thang." }, career: { upright: "Tranh đua.", reversed: "Tranh cãi." }, journey: { upright: "Thử thách nội tại.", reversed: "Kiệt sức." }},
+    "six-of-wands": { love: { upright: "Chiến thắng tình cảm, được công nhận.", reversed: "Kiêu ngạo." }, career: { upright: "Thành công công khai.", reversed: "Thất bại." }, journey: { upright: "Chiến thắng linh hồn.", reversed: "Thiếu công nhận." }},
+    "seven-of-wands": { love: { upright: "Bảo vệ tình yêu trước áp lực.", reversed: "Kiệt sức." }, career: { upright: "Đứng vững.", reversed: "Đầu hàng." }, journey: { upright: "Kiên cường.", reversed: "Áp lực quá lớn." }},
+    "eight-of-wands": { love: { upright: "Tình yêu tiến triển nhanh chóng.", reversed: "Chậm trễ." }, career: { upright: "Tin tức nhanh.", reversed: "Tin xấu." }, journey: { upright: "Chuyển động vũ trụ.", reversed: "Cản trở." }},
+    "nine-of-wands": { love: { upright: "Kiên cường sau tổn thương.", reversed: "Kiệt sức hoàn toàn." }, career: { upright: "Cầm cự.", reversed: "Phòng thủ quá mức." }, journey: { upright: "Sức mạnh cuối cùng.", reversed: "Cần nghỉ ngơi." }},
+    "ten-of-wands": { love: { upright: "Gánh nặng trách nhiệm trong tình yêu.", reversed: "Buông bỏ gánh nặng." }, career: { upright: "Quá tải.", reversed: "Giải phóng." }, journey: { upright: "Bài học gánh vác.", reversed: "Chia sẻ." }},
+    "page-of-wands": { love: { upright: "Tin tức tình cảm nhiệt huyết.", reversed: "Thiếu nhiệt huyết." }, career: { upright: "Ý tưởng mới.", reversed: "Trì hoãn." }, journey: { upright: "Lửa trẻ trung.", reversed: "Tin xấu." }},
+    "knight-of-wands": { love: { upright: "Người phiêu lưu đam mê.", reversed: "Vội vã." }, career: { upright: "Hành động nhanh.", reversed: "Thiếu cam kết." }, journey: { upright: "Hiệp sĩ lửa.", reversed: "Nóng vội." }},
+    "queen-of-wands": { love: { upright: "Tự tin, quyến rũ.", reversed: "Ghen tị." }, career: { upright: "Sức sống rực rỡ.", reversed: "Nóng nảy." }, journey: { upright: "Nữ hoàng lửa.", reversed: "Thiếu tự tin." }},
+    "king-of-wands": { love: { upright: "Lãnh đạo đam mê.", reversed: "Độc đoán." }, career: { upright: "Tầm nhìn xa.", reversed: "Nóng nảy." }, journey: { upright: "Vua lửa.", reversed: "Thiếu tầm nhìn." }},
+
+    // ====================== KIẾM (Swords) ======================
+    "ace-of-swords": { love: { upright: "Sự thật rõ ràng trong tình yêu.", reversed: "Lừa dối." }, career: { upright: "Đột phá trí tuệ.", reversed: "Quyết định sai." }, journey: { upright: "Sự thật linh hồn.", reversed: "Hỗn loạn." }},
+    "two-of-swords": { love: { upright: "Bế tắc cảm xúc.", reversed: "Quyết định dứt khoát." }, career: { upright: "Khó quyết định.", reversed: "Tháo gỡ." }, journey: { upright: "Bịt mắt nội tâm.", reversed: "Thấy rõ." }},
+    "three-of-swords": { love: { upright: "Nỗi đau xé lòng.", reversed: "Chữa lành." }, career: { upright: "Tổn thương.", reversed: "Tha thứ." }, journey: { upright: "Bài học từ đau đớn.", reversed: "Phục hồi." }},
+    "four-of-swords": { love: { upright: "Nghỉ ngơi sau tổn thương.", reversed: "Lo lắng." }, career: { upright: "Phục hồi.", reversed: "Không nghỉ được." }, journey: { upright: "Thiền định.", reversed: "Bất an." }},
+    "five-of-swords": { love: { upright: "Thắng thua trong tình yêu.", reversed: "Hòa giải." }, career: { upright: "Xung đột.", reversed: "Buông bỏ." }, journey: { upright: "Chiến thắng giả.", reversed: "Học cách buông." }},
+    "six-of-swords": { love: { upright: "Chuyển tiếp khỏi khó khăn.", reversed: "Bế tắc." }, career: { upright: "Rời bỏ vấn đề.", reversed: "Quay lại." }, journey: { upright: "Sang bờ sáng.", reversed: "Cản trở." }},
+    "seven-of-swords": { love: { upright: "Gian lận hoặc chiến lược.", reversed: "Thành thật." }, career: { upright: "Chiến lược khôn ngoan.", reversed: "Lộ rõ." }, journey: { upright: "Bài học trung thực.", reversed: "Tự phản bội." }},
+    "eight-of-swords": { love: { upright: "Cảm giác bị kẹt.", reversed: "Giải thoát." }, career: { upright: "Tự giam cầm.", reversed: "Tự do." }, journey: { upright: "Suy nghĩ tiêu cực.", reversed: "Nhìn rõ." }},
+    "nine-of-swords": { love: { upright: "Lo âu đêm khuya.", reversed: "Giảm lo âu." }, career: { upright: "Ác mộng.", reversed: "Tỉnh giấc." }, journey: { upright: "Nỗi sợ nội tâm.", reversed: "Hy vọng." }},
+    "ten-of-swords": { love: { upright: "Kết thúc đau đớn.", reversed: "Phục hồi." }, career: { upright: "Đáy vực.", reversed: "Tái sinh." }, journey: { upright: "Đáy vực linh hồn.", reversed: "Lên." }},
+    "page-of-swords": { love: { upright: "Tin nhắn sắc bén.", reversed: "Tin xấu." }, career: { upright: "Ý tưởng mới.", reversed: "Dối trá." }, journey: { upright: "Cảnh giác.", reversed: "Thiếu cảnh giác." }},
+    "knight-of-swords": { love: { upright: "Hành động dứt khoát.", reversed: "Hung hăng." }, career: { upright: "Quyết đoán.", reversed: "Vội vã." }, journey: { upright: "Hiệp sĩ trí tuệ.", reversed: "Thiếu suy nghĩ." }},
+    "queen-of-swords": { love: { upright: "Thông minh, rõ ràng.", reversed: "Cay nghiệt." }, career: { upright: "Độc lập.", reversed: "Tổn thương." }, journey: { upright: "Nữ hoàng kiếm.", reversed: "Lạnh lùng." }},
+    "king-of-swords": { love: { upright: "Công bằng và lý trí.", reversed: "Độc đoán." }, career: { upright: "Lãnh đạo trí tuệ.", reversed: "Lạm quyền." }, journey: { upright: "Vua công lý.", reversed: "Thiếu nhân tính." }},
+
+    // ====================== TIỀN (Pentacles) ======================
+    "ace-of-pentacles": { love: { upright: "Cơ hội tình cảm thực tế và bền vững.", reversed: "Cơ hội bị bỏ lỡ." }, career: { upright: "Cơ hội tài chính vàng.", reversed: "Mất mát." }, journey: { upright: "Nền tảng mới.", reversed: "Cần chú ý thực tế." }},
+    "two-of-pentacles": { love: { upright: "Cân bằng nhiều mối quan hệ.", reversed: "Mất cân bằng." }, career: { upright: "Xoay sở nhiều việc.", reversed: "Quá tải." }, journey: { upright: "Cân bằng nội tại.", reversed: "Rối loạn." }},
+    "three-of-pentacles": { love: { upright: "Xây dựng mối quan hệ có hệ thống.", reversed: "Thiếu phối hợp." }, career: { upright: "Hợp tác thành công.", reversed: "Thiếu hợp tác." }, journey: { upright: "Hoàn thiện bản thân.", reversed: "Tự lập." }},
+    "four-of-pentacles": { love: { upright: "Giữ chặt, sợ mất.", reversed: "Buông bỏ." }, career: { upright: "Giữ tài chính.", reversed: "Chia sẻ." }, journey: { upright: "Giữ năng lượng.", reversed: "Cần buông." }},
+    "five-of-pentacles": { love: { upright: "Cô đơn trong tình cảm.", reversed: "Giúp đỡ đến." }, career: { upright: "Khó khăn tài chính.", reversed: "Hỗ trợ." }, journey: { upright: "Thử thách.", reversed: "Không cô đơn." }},
+    "six-of-pentacles": { love: { upright: "Cho và nhận cân bằng.", reversed: "Bất công." }, career: { upright: "Chia sẻ.", reversed: "Tham lam." }, journey: { upright: "Cân bằng vũ trụ.", reversed: "Mất cân bằng." }},
+    "seven-of-pentacles": { love: { upright: "Kiên nhẫn chờ tình yêu.", reversed: "Thiếu kiên nhẫn." }, career: { upright: "Chờ thành quả.", reversed: "Thất vọng." }, journey: { upright: "Kiên nhẫn.", reversed: "Thu hoạch kém." }},
+    "eight-of-pentacles": { love: { upright: "Rèn luyện tình yêu.", reversed: "Kiệt sức." }, career: { upright: "Luyện kỹ năng.", reversed: "Lười biếng." }, journey: { upright: "Hoàn thiện linh hồn.", reversed: "Thiếu tập trung." }},
+    "nine-of-pentacles": { love: { upright: "Tình yêu độc lập, sung túc.", reversed: "Cô lập." }, career: { upright: "Thành công độc lập.", reversed: "Mất mát." }, journey: { upright: "Tự do nội tại.", reversed: "Cần cân bằng." }},
+    "ten-of-pentacles": { love: { upright: "Hạnh phúc gia đình lâu dài.", reversed: "Xung đột gia đình." }, career: { upright: "Thịnh vượng lâu dài.", reversed: "Mất di sản." }, journey: { upright: "Di sản linh hồn.", reversed: "Cần chữa lành." }},
+    "page-of-pentacles": { love: { upright: "Cơ hội học hỏi trong tình yêu.", reversed: "Bỏ lỡ." }, career: { upright: "Kế hoạch thực tế.", reversed: "Thiếu tập trung." }, journey: { upright: "Học hỏi.", reversed: "Cơ hội bị bỏ lỡ." }},
+    "knight-of-pentacles": { love: { upright: "Yêu chậm nhưng chắc chắn.", reversed: "Cứng nhắc." }, career: { upright: "Chăm chỉ đáng tin.", reversed: "Lười biếng." }, journey: { upright: "Tiến bộ vững chắc.", reversed: "Cần linh hoạt." }},
+    "queen-of-pentacles": { love: { upright: "Chu đáo, nuôi dưỡng tình yêu bằng hành động.", reversed: "Bỏ bê." }, career: { upright: "Thịnh vượng thực tế.", reversed: "Tham lam." }, journey: { upright: "Chăm sóc bản thân.", reversed: "Bỏ bê." }},
+    "king-of-pentacles": { love: { upright: "Ổn định, an toàn tuyệt đối.", reversed: "Tham lam ảnh hưởng tình cảm." }, career: { upright: "Thành công vật chất.", reversed: "Bất ổn." }, journey: { upright: "Ổn định linh hồn.", reversed: "Cân bằng vật chất-tinh thần." }},
+    "the-unknown": {
+        love: { 
+            upright: "Tình yêu đầy bí ẩn, chưa thể nhìn rõ. Đây là lúc để bạn tin tưởng và để vũ trụ sắp xếp.", 
+            reversed: "Sợ hãi không biết đối phương nghĩ gì, né tránh cam kết sâu." 
+        },
+        career: { 
+            upright: "Cơ hội nằm ở những điều bạn chưa từng thử. Hãy dũng cảm khám phá.", 
+            reversed: "Sợ thay đổi, bám víu vào vùng an toàn." 
+        },
+        journey: { 
+            upright: "Hành trình vào vùng tối của linh hồn, nơi sẽ mang lại ánh sáng lớn nhất.", 
+            reversed: "Tránh né bài học quan trọng của vũ trụ." 
+        }
+    },
+    "the-cosmos": {
+        love: { 
+            upright: "Tình yêu được kết nối bởi định mệnh vũ trụ, sâu sắc và bao la.", 
+            reversed: "Cảm giác lạc lõng trong mối quan hệ, mất kết nối linh hồn." 
+        },
+        career: { 
+            upright: "Thành công lớn khi bạn hòa hợp với dòng chảy vũ trụ.", 
+            reversed: "Cảm thấy nhỏ bé, thiếu động lực." 
+        },
+        journey: { 
+            upright: "Bạn đang hòa quyện với toàn thể vũ trụ, đạt được sự toàn vẹn.", 
+            reversed: "Mất cảm giác kết nối với nguồn năng lượng lớn." 
+        }
     }
-    // Bạn có thể thêm nhiều lá khác vào đây sau nếu muốn
 };
+
+
+// ====================== POSITION-SPECIFIC FLAVORS (Ý NGHĨA THEO TỪNG VỊ TRÍ) ======================
+// ====================== POSITION-SPECIFIC FLAVORS (MỖI VỊ TRÍ 8 TRƯỜNG HỢP – ĐÃ MỞ RỘNG TỐI ĐA) ======================
+const positionSpecificFlavors = {
+    love: [
+        // 0 - Bạn
+        {
+            upright: [
+                "Đây là <strong>thái độ & năng lượng hiện tại của bạn</strong> trong tình yêu. Lá bài phản ánh chính xác cách bạn đang cảm nhận và tiếp cận mối quan hệ lúc này.",
+                "Lá bài đang soi chiếu <strong>nội tâm của bạn</strong>: cảm xúc thật sự, mong muốn và cách bạn đang đứng trong mối quan hệ.",
+                "Đây là <strong>gương phản chiếu bản thân bạn</strong> trong tình cảm – những gì bạn đang mang theo vào mối quan hệ.",
+                "Năng lượng của chính bạn đang được vũ trụ làm nổi bật qua lá này.",
+                "Bạn đang ở trạng thái gì trong tình yêu? Lá bài trả lời rất rõ ràng và chân thực.",
+                "Lá bài hé lộ <strong>vai trò và cảm xúc của bạn</strong> trong mối quan hệ hiện tại.",
+                "Đây là bức tranh nội tâm của bạn – những gì trái tim bạn đang thực sự khao khát.",
+                "Vũ trụ đang chỉ ra cách bạn đang góp phần định hình mối quan hệ này."
+            ],
+            reversed: [
+                "Đây là <strong>trạng thái ngược của bạn</strong>: có thể bạn đang do dự, che giấu cảm xúc hoặc có rào cản nội tâm cần giải quyết ngay.",
+                "Nội tâm bạn đang bị đảo ngược – cảm xúc bị kìm nén, sợ hãi hoặc đang tự tạo khoảng cách.",
+                "Lá bài cảnh báo bạn đang mang năng lượng tiêu cực hoặc phòng thủ quá mức trong tình cảm.",
+                "Bạn cần nhìn lại chính mình: có điều gì đó đang cản trở trái tim bạn mở ra?",
+                "Trạng thái ngược cho thấy bạn đang tự hạn chế hoặc chưa sẵn sàng đón nhận tình yêu.",
+                "Bạn đang vô tình tạo rào cản cảm xúc, khiến mối quan hệ khó tiến triển.",
+                "Năng lượng ngược của bạn đang làm chậm lại dòng chảy tình cảm.",
+                "Đây là lúc bạn cần chữa lành nội tâm để không vô tình đẩy người ấy ra xa."
+            ]
+        },
+        // 1 - Người Ấy
+        {
+            upright: [
+                "Đây là <strong>năng lượng & góc nhìn của người ấy</strong> dành cho bạn. Lá bài cho thấy đối phương đang nghĩ gì và cảm nhận ra sao về mối quan hệ.",
+                "Lá bài đang hé lộ <strong>trái tim và suy nghĩ của người ấy</strong> lúc này.",
+                "Đây là bức tranh về <strong>người kia</strong>: họ đang mang năng lượng gì đến với bạn.",
+                "Vũ trụ đang cho bạn thấy rõ góc nhìn hiện tại của đối phương.",
+                "Năng lượng của người ấy đang được làm rõ qua vị trí này.",
+                "Lá bài phản ánh chính xác cảm xúc và ý định của người ấy dành cho bạn.",
+                "Đây là lời thì thầm của vũ trụ về những gì người ấy đang giữ trong lòng.",
+                "Bạn đang được nhìn thấy rõ ràng cách người ấy đang tiếp cận tình cảm này."
+            ],
+            reversed: [
+                "Năng lượng của <strong>người ấy</strong> đang bị đảo ngược: họ có thể đang che giấu cảm xúc, do dự hoặc có xung đột nội tâm.",
+                "Người kia đang ở trạng thái ngược – có thể đang lạnh lùng, sợ hãi cam kết hoặc chưa thật lòng.",
+                "Lá bài cảnh báo đối phương đang mang năng lượng hỗn loạn hoặc đang tự kìm hãm.",
+                "Góc nhìn của người ấy hiện tại chưa rõ ràng hoặc đang bị che khuất.",
+                "Họ có thể đang né tránh hoặc chưa sẵn sàng mở lòng hoàn toàn.",
+                "Người ấy đang tự tạo khoảng cách hoặc đang đấu tranh nội tâm mạnh mẽ.",
+                "Năng lượng ngược cho thấy họ đang giữ lại cảm xúc thật sự.",
+                "Đây là dấu hiệu người kia cần thời gian để giải tỏa những nút thắt bên trong."
+            ]
+        },
+        // 2 - Tương Lai
+        {
+            upright: [
+                "Đây là <strong>tiềm năng tương lai</strong> của mối quan hệ nếu tiếp tục xu hướng hiện tại. Vũ trụ đang vẽ hướng đi phía trước.",
+                "Lá bài cho thấy <strong>hướng đi sắp tới</strong> của tình yêu này nếu hai bạn giữ nguyên năng lượng hiện tại.",
+                "Đây là viễn cảnh đẹp đẽ nhất mà vũ trụ đang chuẩn bị cho mối quan hệ.",
+                "Tương lai đang được định hình rõ ràng qua lá này.",
+                "Hướng phát triển tự nhiên của mối quan hệ trong thời gian tới.",
+                "Vũ trụ đang hé mở cánh cửa tương lai đầy hứa hẹn cho hai bạn.",
+                "Đây là kết quả tiềm năng nếu bạn và người ấy tiếp tục đồng hành.",
+                "Lá bài vẽ nên bức tranh tương lai sáng sủa và sâu sắc của tình yêu này."
+            ],
+            reversed: [
+                "Tương lai có thể gặp trở ngại hoặc cần điều chỉnh nếu không thay đổi năng lượng hiện tại.",
+                "Lá bài cảnh báo hướng đi ngược: mối quan hệ có nguy cơ đình trệ hoặc lệch lạc nếu không sửa chữa.",
+                "Tiềm năng tương lai đang bị đảo ngược – cần hành động ngay để xoay chuyển.",
+                "Đây là lời nhắc nhở rằng tương lai chưa định sẵn, bạn vẫn có thể thay đổi nó.",
+                "Hướng đi hiện tại nếu không điều chỉnh sẽ dẫn đến kết quả không như mong đợi.",
+                "Tương lai đang có dấu hiệu thử thách, cần bạn chủ động thay đổi năng lượng.",
+                "Lá bài ngược cảnh báo mối quan hệ có thể đi theo hướng không mong muốn.",
+                "Đây là tín hiệu vũ trụ rằng bạn cần điều chỉnh để tương lai vẫn đẹp."
+            ]
+        }
+    ],
+
+    career: [
+        // 0 - Hiện Tại
+        {
+            upright: [
+                "Đây là <strong>tình trạng hiện tại</strong> của sự nghiệp/tài chính. Lá bài phản ánh thực tế bạn đang đối mặt lúc này.",
+                "Lá bài đang mô tả chính xác <strong>thực trạng công việc</strong> của bạn ở thời điểm hiện tại.",
+                "Đây là bức tranh tổng quan về năng lượng sự nghiệp bạn đang sở hữu.",
+                "Vũ trụ đang cho bạn thấy rõ vị trí hiện tại của mình trong hành trình nghề nghiệp.",
+                "Tình hình công việc/tài chính lúc này được lá bài làm nổi bật.",
+                "Đây là năng lượng thực tế đang bao quanh bạn trong lĩnh vực sự nghiệp.",
+                "Lá bài phản ánh những gì đang diễn ra xung quanh công việc của bạn.",
+                "Hiện tại sự nghiệp của bạn đang mang màu sắc và năng lượng này."
+            ],
+            reversed: [
+                "Hiện tại đang ở chiều ngược: có thể có trì hoãn, bất ổn hoặc yếu tố cần khắc phục ngay.",
+                "Tình trạng hiện tại bị đảo ngược – đang có trở ngại hoặc năng lượng tiêu cực.",
+                "Lá bài cảnh báo hiện tại đang bị kẹt hoặc cần điều chỉnh khẩn cấp.",
+                "Bạn đang ở giai đoạn sự nghiệp cần nhìn nhận lại và sửa chữa.",
+                "Năng lượng hiện tại đang bị lệch lạc, dễ dẫn đến trì trệ.",
+                "Đây là lúc bạn cần nhận ra những điểm yếu đang tồn tại trong công việc.",
+                "Hiện tại ngược cho thấy có sự mất cân bằng cần được cân chỉnh ngay.",
+                "Lá bài nhắc bạn đang đứng trước một nút thắt cần tháo gỡ trong sự nghiệp."
+            ]
+        },
+        // 1 - Cơ Hội
+        {
+            upright: [
+                "Đây là <strong>cơ hội & điểm mạnh</strong> đang chờ bạn nắm bắt. Vũ trụ đang mở ra cánh cửa thuận lợi.",
+                "Lá bài chỉ ra những <strong>điểm sáng và cơ hội vàng</strong> đang đến với bạn.",
+                "Đây là lợi thế hiện hữu mà bạn nên tận dụng ngay lúc này.",
+                "Vũ trụ đang đặt trước mặt bạn một cơ hội rất đáng giá.",
+                "Đây là cánh cửa may mắn đang rộng mở trong sự nghiệp.",
+                "Lá bài hé lộ tiềm năng phát triển và thành công đang chờ bạn.",
+                "Cơ hội lớn đang hiện rõ qua lá này – hãy nắm lấy.",
+                "Đây là thời điểm thuận lợi nhất để bạn bước lên một bậc thang mới."
+            ],
+            reversed: [
+                "Cơ hội vẫn tồn tại nhưng đang bị che khuất hoặc cần hành động quyết liệt hơn để nắm lấy.",
+                "Cơ hội đang ở dạng ngược – dễ bị bỏ lỡ nếu bạn không chủ động.",
+                "Lá bài cảnh báo cơ hội đang bị trì hoãn hoặc cần bạn nỗ lực hơn.",
+                "Cơ hội vẫn có, nhưng đang bị che bởi những trở ngại nhỏ.",
+                "Bạn cần nhìn sâu hơn để phát hiện cơ hội ẩn đang chờ đợi.",
+                "Năng lượng ngược khiến cơ hội chưa đến thời điểm chín muồi.",
+                "Đây là lúc bạn phải chủ động tạo ra cơ hội thay vì chờ đợi.",
+                "Cơ hội bị đảo ngược nhắc bạn cần thay đổi cách tiếp cận."
+            ]
+        },
+        // 2 - Rủi Ro
+        {
+            upright: [
+                "Đây là <strong>rủi ro & thử thách tiềm ẩn</strong> cần đề phòng. Lá bài cảnh báo những trở ngại có thể xảy ra.",
+                "Lá bài đang chỉ ra <strong>điểm yếu và nguy cơ</strong> bạn cần lưu ý.",
+                "Đây là những thử thách tiềm ẩn đang chờ đợi trên con đường sự nghiệp.",
+                "Vũ trụ nhắc nhở bạn về những rủi ro cần chuẩn bị tinh thần.",
+                "Lá bài vẽ ra những trở ngại có thể xuất hiện trong thời gian tới.",
+                "Đây là lời cảnh tỉnh về những vấn đề cần đề phòng.",
+                "Rủi ro đang hiện rõ – hãy chuẩn bị kế hoạch ứng phó.",
+                "Lá bài giúp bạn nhận diện trước những chướng ngại sắp đến."
+            ],
+            reversed: [
+                "Rủi ro đang ở mức cao hơn dự kiến, cần cảnh giác và chuẩn bị kế hoạch dự phòng.",
+                "Thử thách đang bị đảo ngược – có thể biến thành cơ hội nếu bạn xử lý khéo.",
+                "Lá bài ngược cho thấy rủi ro có thể được hóa giải nếu bạn chủ động.",
+                "Nguy cơ đang tồn tại nhưng chưa quá lớn, vẫn còn thời gian xoay chuyển.",
+                "Đây là lúc rủi ro có thể trở thành bài học quý giá.",
+                "Năng lượng ngược nhắc bạn rằng thử thách không phải là kết thúc.",
+                "Rủi ro bị đảo ngược – hãy biến nó thành động lực tiến bước.",
+                "Lá bài cảnh báo nhưng cũng mở ra lối thoát cho bạn."
+            ]
+        },
+        // 3 - Lời Khuyên
+        {
+            upright: [
+                "Đây là <strong>lời khuyên hành động cụ thể</strong> từ vũ trụ. Hãy làm theo hướng này để đạt kết quả tốt nhất.",
+                "Vũ trụ đang hướng dẫn bạn nên làm gì tiếp theo qua lá này.",
+                "Đây là chỉ dẫn rõ ràng nhất để bạn tiến về phía trước trong sự nghiệp.",
+                "Lá bài mang đến lời khuyên thực tế và hiệu quả nhất lúc này.",
+                "Đây chính là bước đi mà vũ trụ khuyên bạn nên thực hiện.",
+                "Lời khuyên từ vũ trụ rất rõ ràng và dễ áp dụng.",
+                "Hãy lắng nghe và hành động theo hướng lá bài chỉ ra.",
+                "Đây là chìa khóa thành công mà vũ trụ đang trao cho bạn."
+            ],
+            reversed: [
+                "Lời khuyên ngược: bạn cần buông bỏ hoặc thay đổi cách tiếp cận hiện tại để tránh mắc lỗi.",
+                "Đây là lời nhắc nhở bạn phải dừng hoặc đảo ngược cách làm hiện tại.",
+                "Lá bài ngược khuyên bạn nên thay đổi chiến lược hoặc buông bỏ điều cũ.",
+                "Bạn cần dừng lại và xem xét lại cách hành động hiện tại.",
+                "Lời khuyên ngược giúp bạn tránh được sai lầm lớn.",
+                "Đây là tín hiệu bạn phải chuyển hướng để không đi sai đường.",
+                "Lá bài nhắc bạn buông bỏ những gì không còn phù hợp.",
+                "Hành động ngược lại với thói quen cũ sẽ mang lại kết quả tốt."
+            ]
+        }
+    ],
+
+    journey: [
+        // 0 - Quá Khứ
+        {
+            upright: [
+                "Đây là <strong>nền tảng từ quá khứ</strong> đã định hình hành trình hiện tại của bạn.",
+                "Lá bài phản ánh những bài học và trải nghiệm từ quá khứ đang ảnh hưởng đến bạn.",
+                "Đây là gốc rễ của hành trình linh hồn – những gì đã xảy ra trước đây.",
+                "Quá khứ đang được vũ trụ làm nổi bật để bạn hiểu rõ hơn về hiện tại.",
+                "Lá bài hé lộ nền tảng mà hành trình của bạn đang đứng trên.",
+                "Đây là những hạt giống từ quá khứ đang nảy mầm trong hiện tại.",
+                "Vũ trụ nhắc bạn nhớ lại bài học quan trọng từ những gì đã qua.",
+                "Quá khứ là nền tảng vững chắc hoặc bài học cần ôn lại."
+            ],
+            reversed: [
+                "Quá khứ đang ảnh hưởng ngược: có bài học cũ chưa được giải quyết hoàn toàn.",
+                "Lá bài cảnh báo bạn đang mang theo gánh nặng hoặc vết thương từ quá khứ.",
+                "Quá khứ bị đảo ngược – cần buông bỏ để không kìm hãm hiện tại.",
+                "Đây là lúc bạn cần chữa lành những điều chưa xong từ trước.",
+                "Năng lượng ngược cho thấy quá khứ vẫn đang cản trở bạn.",
+                "Lá bài nhắc bạn giải phóng những bài học cũ chưa hoàn tất.",
+                "Quá khứ đang lặp lại theo cách tiêu cực nếu không được xử lý.",
+                "Đây là tín hiệu cần cắt đứt với những mẫu hình cũ từ kiếp trước."
+            ]
+        },
+        // 1 - Hiện Tại
+        {
+            upright: [
+                "Đây là <strong>trọng tâm & năng lượng hiện tại</strong> của hành trình linh hồn.",
+                "Lá bài đang mô tả chính xác giai đoạn bạn đang trải qua lúc này.",
+                "Đây là năng lượng trung tâm của hành trình linh hồn hiện tại.",
+                "Vũ trụ đang tập trung ánh sáng vào khoảnh khắc hiện tại của bạn.",
+                "Lá bài cho thấy bạn đang đứng ở vị trí nào trên con đường thức tỉnh.",
+                "Đây là trọng tâm mà linh hồn bạn đang chú ý nhất.",
+                "Hiện tại của hành trình được lá bài làm rõ và nhấn mạnh.",
+                "Bạn đang ở trung tâm của một chu kỳ quan trọng trên hành trình."
+            ],
+            reversed: [
+                "Hiện tại đang bị đảo ngược: cần dừng lại để nhìn nhận lại.",
+                "Năng lượng hiện tại bị lệch – có thể bạn đang lạc hướng hoặc bế tắc.",
+                "Lá bài nhắc bạn cần điều chỉnh lại cách tiếp cận hiện tại.",
+                "Hiện tại ngược cho thấy có sự mất cân bằng cần được sửa chữa.",
+                "Đây là lúc bạn nên tạm dừng để quan sát lại hành trình.",
+                "Lá bài cảnh báo hiện tại đang không đi đúng dòng chảy vũ trụ.",
+                "Bạn đang trải qua giai đoạn cần nhìn nhận lại và tái định hướng.",
+                "Năng lượng ngược nhắc bạn không nên tiếp tục theo quán tính."
+            ]
+        },
+        // 2 - Thử Thách
+        {
+            upright: [
+                "Đây là <strong>thử thách chính</strong> đang cản bước bạn trên hành trình.",
+                "Lá bài chỉ ra trở ngại lớn nhất mà linh hồn bạn đang đối mặt.",
+                "Đây là bài kiểm tra quan trọng nhất trên hành trình linh hồn.",
+                "Vũ trụ đang đặt thử thách này để bạn trưởng thành.",
+                "Thử thách hiện tại được lá bài làm rõ và nhấn mạnh.",
+                "Đây là nút thắt cần vượt qua để tiến xa hơn trên con đường.",
+                "Lá bài vẽ ra thử thách đang giúp bạn rèn luyện sức mạnh nội tại.",
+                "Đây chính là cửa ải mà linh hồn bạn cần chinh phục."
+            ],
+            reversed: [
+                "Thử thách đang ở dạng ngược: nó có thể là cơ hội chuyển hóa mạnh mẽ nếu bạn đối diện.",
+                "Lá bài ngược biến thử thách thành bài học quý giá và dễ vượt qua hơn.",
+                "Thử thách bị đảo ngược – hãy xem nó như cơ hội thay vì chướng ngại.",
+                "Đây là lúc thử thách đang giúp bạn lột xác nhanh chóng.",
+                "Năng lượng ngược cho thấy thử thách sẽ mang lại ánh sáng lớn.",
+                "Lá bài nhắc bạn rằng thử thách này thực ra là món quà.",
+                "Thử thách ngược đang mở ra cánh cửa chuyển hóa sâu sắc.",
+                "Bạn có thể biến trở ngại này thành bước nhảy vọt của linh hồn."
+            ]
+        },
+        // 3 - Lời Khuyên
+        {
+            upright: [
+                "Đây là <strong>lời khuyên từ vũ trụ</strong> để bạn vượt qua thử thách.",
+                "Vũ trụ đang gửi đến bạn chỉ dẫn rõ ràng nhất cho hành trình.",
+                "Lá bài mang lời khuyên thiêng liêng dành riêng cho bạn lúc này.",
+                "Đây là hướng đi mà vũ trụ khuyên bạn nên thực hiện.",
+                "Lời khuyên từ vũ trụ rất rõ ràng và mang tính định hướng.",
+                "Hãy lắng nghe và làm theo hướng lá bài chỉ ra.",
+                "Đây là chìa khóa giúp bạn vượt qua giai đoạn hiện tại.",
+                "Lá bài là lời thì thầm của vũ trụ dành cho hành trình của bạn."
+            ],
+            reversed: [
+                "Lời khuyên ngược: bạn cần buông bỏ cách cũ để tiến bước.",
+                "Đây là lúc bạn phải thay đổi hoàn toàn cách tiếp cận cũ.",
+                "Lá bài ngược khuyên bạn dừng lại hoặc đảo ngược hướng đi.",
+                "Bạn cần buông bỏ những gì không còn phục vụ hành trình.",
+                "Lời khuyên ngược giúp bạn tránh được vòng lặp cũ.",
+                "Đây là tín hiệu vũ trụ rằng bạn phải thay đổi để tiến hóa.",
+                "Lá bài nhắc bạn không nên tiếp tục theo cách cũ.",
+                "Hành động ngược lại sẽ mở ra con đường sáng hơn."
+            ]
+        },
+        // 4 - Kết Quả
+        {
+            upright: [
+                "Đây là <strong>kết quả tiềm năng</strong> nếu bạn làm theo lời khuyên.",
+                "Lá bài cho thấy hướng kết thúc đẹp đẽ của hành trình nếu bạn hành động đúng.",
+                "Đây là viễn cảnh tương lai mà vũ trụ đang chuẩn bị cho bạn.",
+                "Kết quả tiềm năng rất sáng sủa nếu bạn giữ vững năng lượng.",
+                "Lá bài vẽ nên kết quả viên mãn của hành trình linh hồn.",
+                "Đây là phần thưởng mà vũ trụ dành cho bạn sau khi vượt thử thách.",
+                "Kết quả cuối cùng sẽ mang lại sự toàn vẹn và thức tỉnh.",
+                "Hành trình sẽ kết thúc đẹp nếu bạn làm theo lời khuyên này."
+            ],
+            reversed: [
+                "Kết quả có thể bị trì hoãn hoặc thay đổi nếu không điều chỉnh kịp thời.",
+                "Lá bài cảnh báo kết quả sẽ không như mong đợi nếu không thay đổi.",
+                "Kết quả bị đảo ngược – cần bạn chủ động điều chỉnh ngay.",
+                "Đây là lời nhắc rằng kết quả vẫn có thể thay đổi theo hướng tốt hơn.",
+                "Lá bài ngược cho thấy kết quả đang bị trì hoãn vì một lý do.",
+                "Bạn vẫn có thể xoay chuyển kết quả nếu hành động kịp thời.",
+                "Kết quả tiềm năng đang bị che khuất nhưng chưa phải là cuối cùng.",
+                "Đây là tín hiệu cần điều chỉnh để đạt được kết quả viên mãn."
+            ]
+        }
+    ]
+};
+
+// ====================== TẦNG NHÂN QUẢ & TẦNG LINH HỒN (10 TRƯỜNG HỢP MỖI TẦNG – THEO TỪNG LOẠI TRẢI BÀI) ======================
+const karmaLayers = {
+    love: {
+        upright: [
+            "Hành động hôm nay sẽ tạo nên quả báo đẹp đẽ trong tình yêu tương lai gần.",
+            "Năng lượng bạn đang gieo hôm nay sẽ trở thành món quà tình cảm mà vũ trụ trao lại.",
+            "Mọi lời nói và hành vi chân thành hôm nay sẽ trở thành định mệnh đẹp trong tình yêu.",
+            "Bạn đang gieo nhân tốt đẹp – quả báo sẽ là mối quan hệ sâu sắc và viên mãn.",
+            "Hành động yêu thương hôm nay sẽ mở ra cánh cửa hạnh phúc đôi lứa.",
+            "Vũ trụ ghi nhận từng cử chỉ chân thành của bạn và sẽ đáp lại bằng tình yêu đích thực.",
+            "Nhân quả tình cảm đang vận hành: điều bạn cho đi hôm nay sẽ trở về gấp bội.",
+            "Hành động hôm nay chính là hạt giống cho một mối tình định mệnh đẹp đẽ.",
+            "Bạn đang viết nên câu chuyện nhân quả tình yêu – tương lai sẽ rất ngọt ngào.",
+            "Mọi nỗ lực chân thành trong tình cảm hôm nay sẽ trở thành phước lành lớn."
+        ],
+        reversed: [
+            "Bài học từ kiếp trước về tình yêu đang trở lại để bạn giải quyết và chuyển hóa.",
+            "Nhân quả tình cảm đang nhắc nhở bạn cần sửa chữa những vết thương cũ.",
+            "Hành động tiêu cực hoặc do dự hôm nay có thể kéo dài quả báo trong tình cảm.",
+            "Vũ trụ đang cho bạn cơ hội xóa bỏ nghiệp chướng tình cảm từ quá khứ.",
+            "Nhân quả ngược nhắc bạn đừng lặp lại sai lầm cũ trong mối quan hệ.",
+            "Bạn đang nhận lại quả báo của những gì chưa buông bỏ trong tình yêu.",
+            "Tầng nhân quả cảnh báo cần chữa lành để không mang nghiệp cũ vào hiện tại.",
+            "Quả báo tình cảm đang đến – đây là lúc để bạn giải phóng và tha thứ.",
+            "Nhân quả đang vận hành theo chiều ngược: cần dừng lại để không tạo thêm tổn thương.",
+            "Bài học nhân quả tình yêu từ kiếp trước đang đòi hỏi bạn đối diện và chuyển hóa."
+        ]
+    },
+    career: {
+        upright: [
+            "Hành động hôm nay sẽ tạo nên quả báo đẹp đẽ trong sự nghiệp tương lai gần.",
+            "Mọi nỗ lực chân thành bạn bỏ ra hôm nay sẽ trở thành thành tựu lớn.",
+            "Nhân quả sự nghiệp đang vận hành tích cực – thành quả sẽ đến rất nhanh.",
+            "Bạn đang gieo nhân tốt – vũ trụ sẽ ban thưởng bằng cơ hội thăng tiến.",
+            "Hành động chuyên nghiệp và kiên trì hôm nay sẽ trở thành di sản nghề nghiệp.",
+            "Nhân quả công việc đang hỗ trợ bạn: điều bạn đầu tư hôm nay sẽ đơm hoa kết trái.",
+            "Vũ trụ ghi nhận từng bước chân của bạn và sẽ đáp lại bằng thành công xứng đáng.",
+            "Hành động hôm nay chính là nền tảng cho sự thịnh vượng lâu dài.",
+            "Bạn đang viết nhân quả sự nghiệp đẹp – tương lai sẽ rất rực rỡ.",
+            "Mọi cố gắng hôm nay sẽ trở thành quả báo vàng trong con đường sự nghiệp."
+        ],
+        reversed: [
+            "Bài học từ kiếp trước về sự nghiệp đang trở lại để bạn giải quyết và chuyển hóa.",
+            "Nhân quả nghề nghiệp nhắc bạn cần sửa chữa những sai lầm hoặc trì hoãn cũ.",
+            "Quả báo tiêu cực có thể xuất hiện nếu không thay đổi cách hành động.",
+            "Vũ trụ đang cho bạn cơ hội thanh toán nghiệp chướng sự nghiệp từ quá khứ.",
+            "Nhân quả ngược cảnh báo đừng lặp lại mẫu hình thất bại cũ.",
+            "Bạn đang nhận lại quả báo của những gì chưa hoàn thành trong công việc.",
+            "Tầng nhân quả đòi hỏi bạn phải dũng cảm buông bỏ thói quen cũ.",
+            "Quả báo sự nghiệp đang đến theo chiều ngược – cần nhìn nhận và sửa chữa.",
+            "Nhân quả đang nhắc nhở bạn dừng lại để không tạo thêm gánh nặng.",
+            "Bài học nhân quả nghề nghiệp từ kiếp trước đang chờ bạn hoàn tất."
+        ]
+    },
+    journey: {
+        upright: [
+            "Hành động hôm nay sẽ tạo nên quả báo đẹp đẽ trên hành trình linh hồn tương lai gần.",
+            "Mọi bước chân thức tỉnh hôm nay sẽ trở thành ánh sáng dẫn dắt linh hồn bạn.",
+            "Nhân quả linh hồn đang vận hành tích cực – bạn đang gieo nhân lớn.",
+            "Hành động hôm nay chính là hạt giống cho sự toàn vẹn linh hồn sau này.",
+            "Vũ trụ ghi nhận từng sự chuyển hóa của bạn và sẽ ban phước sâu sắc.",
+            "Nhân quả hành trình đang hỗ trợ bạn tiến gần hơn đến bản ngã cao nhất.",
+            "Bạn đang viết nên câu chuyện nhân quả linh hồn rất đẹp.",
+            "Mọi nỗ lực thức tỉnh hôm nay sẽ trở thành quả báo thiêng liêng.",
+            "Hành động hôm nay là nền tảng cho sự thức tỉnh hoàn hảo của linh hồn.",
+            "Nhân quả vũ trụ đang chảy về phía bạn theo chiều tích cực."
+        ],
+        reversed: [
+            "Bài học từ kiếp trước trên hành trình linh hồn đang trở lại để bạn giải quyết.",
+            "Nhân quả linh hồn nhắc bạn cần chuyển hóa những nghiệp chướng cũ.",
+            "Quả báo từ quá khứ đang đòi hỏi bạn phải đối diện và buông bỏ.",
+            "Vũ trụ đang cho bạn cơ hội thanh toán bài học linh hồn chưa xong.",
+            "Nhân quả ngược cảnh báo đừng lặp lại vòng luân hồi cũ.",
+            "Bạn đang nhận lại quả báo của những gì linh hồn chưa hoàn thành.",
+            "Tầng nhân quả đòi hỏi sự dũng cảm buông bỏ để linh hồn tiến hóa.",
+            "Quả báo hành trình đang đến theo chiều ngược – đây là lúc chữa lành sâu.",
+            "Nhân quả linh hồn nhắc bạn dừng lại để không mang nghiệp cũ tiếp tục.",
+            "Bài học từ nhiều kiếp trước đang chờ bạn hoàn tất và giải phóng."
+        ]
+    }
+};
+
+const soulLayers = {
+    love: {
+        upright: [
+            "Đây là khoảnh khắc linh hồn bạn đang thức tỉnh và kết nối mạnh mẽ với tình yêu vũ trụ.",
+            "Linh hồn bạn đang mở rộng để đón nhận tình yêu định mệnh sâu sắc.",
+            "Đây là thời điểm linh hồn hai bạn đang được vũ trụ kéo gần nhau.",
+            "Linh hồn bạn đang rung động và kết nối với nguồn tình yêu vô điều kiện.",
+            "Khoảnh khắc thức tỉnh tình cảm – linh hồn bạn đang tỏa sáng.",
+            "Linh hồn bạn đang được vũ trụ ban phước bằng một mối liên kết thiêng liêng.",
+            "Đây là lúc linh hồn bạn học cách yêu thương chân thật và sâu sắc.",
+            "Linh hồn bạn đang thức tỉnh để đón nhận tình yêu mang tính chữa lành.",
+            "Khoảnh khắc linh hồn kết nối với dòng chảy tình yêu của vũ trụ.",
+            "Linh hồn bạn đang ở trạng thái đẹp nhất để đón nhận tình yêu đích thực."
+        ],
+        reversed: [
+            "Linh hồn bạn đang được mời gọi buông bỏ lớp vỏ cũ để tiến hóa trong tình yêu.",
+            "Linh hồn bạn cần chữa lành vết thương cũ trước khi mở lòng đón tình yêu mới.",
+            "Đây là lúc linh hồn bạn phải đối diện và giải phóng nghiệp chướng tình cảm.",
+            "Linh hồn bạn đang trong giai đoạn chuyển hóa sâu để sẵn sàng cho tình yêu.",
+            "Khoảnh khắc linh hồn cần buông bỏ để không mang gánh nặng vào mối quan hệ.",
+            "Linh hồn bạn đang được vũ trụ nhắc nhở phải chữa lành trước khi tiến bước.",
+            "Đây là bài học linh hồn về việc buông bỏ để tình yêu có thể chảy vào.",
+            "Linh hồn bạn đang lột xác để trở nên sẵn sàng cho tình yêu chân thực.",
+            "Khoảnh khắc linh hồn cần dừng lại để chuyển hóa trước khi đón nhận.",
+            "Linh hồn bạn đang được mời gọi thức tỉnh và giải phóng nỗi sợ trong tình yêu."
+        ]
+    },
+    career: {
+        upright: [
+            "Đây là khoảnh khắc linh hồn bạn đang thức tỉnh và kết nối mạnh mẽ với sứ mệnh sự nghiệp.",
+            "Linh hồn bạn đang tỏa sáng và dẫn dắt bạn đến con đường sự nghiệp đúng đắn.",
+            "Khoảnh khắc linh hồn thức tỉnh – bạn đang được vũ trụ hỗ trợ mạnh mẽ trong công việc.",
+            "Linh hồn bạn đang kết nối với mục đích cao hơn của sự nghiệp.",
+            "Đây là lúc linh hồn bạn tìm thấy ý nghĩa sâu sắc trong hành trình nghề nghiệp.",
+            "Linh hồn bạn đang rung động với dòng chảy thành công mà vũ trụ sắp đặt.",
+            "Khoảnh khắc linh hồn thức tỉnh để bạn thể hiện tài năng lớn lao nhất.",
+            "Linh hồn bạn đang được vũ trụ ban phước trên con đường sự nghiệp.",
+            "Đây là thời điểm linh hồn bạn hòa quyện với sứ mệnh nghề nghiệp thiêng liêng.",
+            "Linh hồn bạn đang ở đỉnh cao để đón nhận thành tựu xứng đáng."
+        ],
+        reversed: [
+            "Linh hồn bạn đang được mời gọi buông bỏ lớp vỏ cũ để tiến hóa trong sự nghiệp.",
+            "Linh hồn bạn cần chữa lành và buông bỏ những giới hạn cũ trong công việc.",
+            "Đây là lúc linh hồn bạn phải đối diện để tìm lại sứ mệnh nghề nghiệp thật sự.",
+            "Linh hồn bạn đang trong giai đoạn chuyển hóa sâu để bước vào con đường mới.",
+            "Khoảnh khắc linh hồn cần buông bỏ để không mang gánh nặng cũ vào sự nghiệp.",
+            "Linh hồn bạn đang được vũ trụ nhắc nhở phải tái định hướng nghề nghiệp.",
+            "Đây là bài học linh hồn về việc buông bỏ để thành công thực sự đến.",
+            "Linh hồn bạn đang lột xác để sẵn sàng cho sứ mệnh cao hơn.",
+            "Khoảnh khắc linh hồn cần dừng lại để chuyển hóa trước khi tiến xa.",
+            "Linh hồn bạn đang được mời gọi thức tỉnh và giải phóng nỗi sợ trong sự nghiệp."
+        ]
+    },
+    journey: {
+        upright: [
+            "Đây là khoảnh khắc linh hồn bạn đang thức tỉnh và kết nối mạnh mẽ với vũ trụ.",
+            "Linh hồn bạn đang tỏa sáng và hòa quyện hoàn hảo với dòng chảy vũ trụ.",
+            "Khoảnh khắc linh hồn thức tỉnh – bạn đang được vũ trụ ôm ấp và dẫn dắt.",
+            "Linh hồn bạn đang ở trạng thái toàn vẹn và kết nối sâu sắc nhất.",
+            "Đây là lúc linh hồn bạn tìm thấy ánh sáng và mục đích cao nhất của hành trình.",
+            "Linh hồn bạn đang rung động với nguồn năng lượng vũ trụ vô hạn.",
+            "Khoảnh khắc linh hồn thức tỉnh để bạn trở thành phiên bản cao nhất của chính mình.",
+            "Linh hồn bạn đang được vũ trụ ban phước mạnh mẽ trên hành trình.",
+            "Đây là thời điểm linh hồn bạn hoàn toàn đồng bộ với định mệnh vũ trụ.",
+            "Linh hồn bạn đang ở đỉnh cao thức tỉnh và kết nối với toàn thể vũ trụ."
+        ],
+        reversed: [
+            "Linh hồn bạn đang được mời gọi buông bỏ lớp vỏ cũ để tiến hóa.",
+            "Linh hồn bạn cần chữa lành và giải phóng những lớp vỏ bảo vệ cũ.",
+            "Đây là lúc linh hồn bạn phải đối diện để thực sự thức tỉnh.",
+            "Linh hồn bạn đang trong giai đoạn chuyển hóa sâu sắc nhất.",
+            "Khoảnh khắc linh hồn cần buông bỏ để không kìm hãm hành trình.",
+            "Linh hồn bạn đang được vũ trụ nhắc nhở phải tái sinh và lột xác.",
+            "Đây là bài học linh hồn về việc buông bỏ để tiến hóa.",
+            "Linh hồn bạn đang lột xác mạnh mẽ để trở nên toàn vẹn hơn.",
+            "Khoảnh khắc linh hồn cần dừng lại để chuyển hóa trước khi bước tiếp.",
+            "Linh hồn bạn đang được mời gọi thức tỉnh và giải phóng mọi ràng buộc cũ."
+        ]
+    }
+};
+
 
         // ====================== TẦNG Ý NGHĨA (ĐÃ BỔ SUNG ) ======================
        const interpretationLayers = {
@@ -634,7 +1275,7 @@ const contextualMeanings = {
             career: { id: 'career', name: 'Sự Nghiệp', positions: [{ title: "1. Hiện Tại", desc: "Tình trạng công việc/tài chính lúc này." }, { title: "2. Cơ Hội", desc: "Điểm mạnh hoặc yếu tố thuận lợi." }, { title: "3. Rủi Ro", desc: "Thử thách tiềm ẩn cần đề phòng." }, { title: "4. Lời Khuyên", desc: "Hành động cụ thể bạn nên làm." }] },
             journey: { id: 'journey', name: 'Hành Trình', positions: [{ title: "1. Quá Khứ", desc: "Nền tảng đã qua." }, { title: "2. Hiện Tại", desc: "Trọng tâm lúc này." }, { title: "3. Thử Thách", desc: "Điều cản bước." }, { title: "4. Lời Khuyên", desc: "Cách giải quyết." }, { title: "5. Kết Quả", desc: "Hướng đi tương lai." }] }
         };
-
+let currentDeckSize = 78;
         let currentSpreadType = 'love';
         let currentCards = [];
         let clarifierCards = {};
@@ -683,33 +1324,40 @@ const contextualMeanings = {
             document.getElementById('startBtn').innerText = "BẮT ĐẦU XÁO BÀI";
         }
 
-        function shuffleDeck() {
-            deckCopy = [...deck];
-            for (let i = deckCopy.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [deckCopy[i], deckCopy[j]] = [deckCopy[j], deckCopy[i]];
-            }
-        }
+    // ====================== XÁO BÀI THEO SỐ LÁ ĐÃ CHỌN ======================
+function shuffleDeck() {
+    deckCopy = [...deck];   // Sao chép bộ bài
 
-        function startSpread() {
-            const container = document.getElementById('spreadContainer');
-            const panel = document.getElementById('readingPanel');
-           
-            container.innerHTML = '';
-            document.getElementById('detailsContainer').innerHTML = '';
-            document.getElementById('summaryBox').style.display = 'none';
-            document.getElementById('summaryBtn').style.display = 'none';
-            panel.classList.remove('show');
-           
-            flippedCount = 0;
-            clarifierCards = {};
-            shuffleDeck();
-           
-            const spreadConf = spreadTypes[currentSpreadType];
-            currentCards = deckCopy.splice(0, spreadConf.positions.length).map(card => ({
-                ...card,
-                isReversed: Math.random() < 0.5
-            }));
+    // Nếu chọn 79 hoặc 80 lá → đã có sẵn trong deck
+    for (let i = deckCopy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deckCopy[i], deckCopy[j]] = [deckCopy[j], deckCopy[i]];
+    }
+}
+
+       function startSpread() {
+    const container = document.getElementById('spreadContainer');
+    const panel = document.getElementById('readingPanel');
+
+    container.innerHTML = '';
+    document.getElementById('detailsContainer').innerHTML = '';
+    document.getElementById('summaryBox').style.display = 'none';
+    document.getElementById('summaryBtn').style.display = 'none';
+    panel.classList.remove('show');
+
+    flippedCount = 0;
+    clarifierCards = {};
+
+    shuffleDeck();
+
+    const spreadConf = spreadTypes[currentSpreadType];
+    const numCardsNeeded = spreadConf.positions.length;
+
+    // Lấy đúng số lá theo cài đặt (78 / 79 / 80)
+    currentCards = deckCopy.splice(0, numCardsNeeded).map(card => ({
+        ...card,
+        isReversed: Math.random() < 0.5
+    }));
             container.classList.add('shuffling');
             createParticles();
             const particleInterval = setInterval(drawParticles, 30);
@@ -793,19 +1441,118 @@ const contextualMeanings = {
             renderDetails();
             if (document.getElementById('summaryBox').style.display === 'block') generateSummary();
         }
-function getContextualMeaning(card, spreadType, isReversed) {
+function getContextualMeaning(card, spreadType, isReversed, positionIndex = 0) {
     const key = isReversed ? 'reversed' : 'upright';
     const context = contextualMeanings[card.id];
+    
+    let coreMeaning = isReversed ? card.reversedMeaning : card.meaning;
     if (context && context[spreadType] && context[spreadType][key]) {
-        return context[spreadType][key];
+        coreMeaning = context[spreadType][key];
     }
-    return isReversed ? card.reversedMeaning : card.meaning;
-}
-      function getLayeredAnalysis(card, spreadType) {
-    const isRev = card.isReversed;
-    const meaning = getContextualMeaning(card, spreadType, isRev);
-    const key = isRev ? card.reversedKeyword : card.keyword;
 
+    // Chọn ngẫu nhiên 1 cách nói từ mảng (position-specific)
+    let positionFlavor = '';
+    const flavorGroup = positionSpecificFlavors[spreadType];
+    if (flavorGroup && flavorGroup[positionIndex]) {
+        const options = flavorGroup[positionIndex][key];
+        if (Array.isArray(options) && options.length > 0) {
+            positionFlavor = options[Math.floor(Math.random() * options.length)];
+        } else if (typeof options === 'string') {
+            positionFlavor = options;
+        }
+    }
+
+    return coreMeaning + (positionFlavor ? `<br><br><span style="color:#ff9f1c; font-weight:600;">${positionFlavor}</span>` : '');
+}
+     // ====================== NGUYÊN TỐ + SỐ HỌC TAROT 
+function getElementAndNumerology(card, isReversed) {
+    let element = "";
+    let elementEmoji = "";
+    let elementDesc = "";
+    let number = "";
+    let numberMeaning = "";
+
+    // Kiểm tra xem có phải lá đặc biệt (chỉ có khi deck 79 hoặc 80)
+    const isSpecialCard = card.id === "the-unknown" || card.id === "the-cosmos";
+
+    // ── XÁC ĐỊNH NGUYÊN TỐ ─────────────────────────────────────
+    if (card.id.includes("cups")) {
+        element = "Nước"; elementEmoji = "🌊";
+        elementDesc = isReversed 
+            ? "Dòng cảm xúc đang bị tắc nghẽn, cần chữa lành trái tim và buông bỏ tổn thương cũ" 
+            : "Dòng chảy tình yêu, trực giác mạnh mẽ và sự nuôi dưỡng nội tâm sâu sắc";
+    } 
+    else if (card.id.includes("wands")) {
+        element = "Lửa"; elementEmoji = "🔥";
+        elementDesc = isReversed 
+            ? "Ngọn lửa đam mê đang bị dập tắt hoặc bùng lên không kiểm soát" 
+            : "Đam mê sáng tạo, năng lượng bùng nổ và sức mạnh hành động";
+    } 
+    else if (card.id.includes("swords")) {
+        element = "Khí"; elementEmoji = "💨";
+        elementDesc = isReversed 
+            ? "Suy nghĩ hỗn loạn, cần làm rõ sự thật và tháo gỡ nút thắt trong tâm trí" 
+            : "Trí tuệ sắc bén, logic rõ ràng và sự thật được phơi bày";
+    } 
+    else if (card.id.includes("pentacles")) {
+        element = "Đất"; elementEmoji = "🌍";
+        elementDesc = isReversed 
+            ? "Nền tảng vật chất đang lung lay hoặc bạn đang quá bám víu vào an toàn" 
+            : "Thực tế, tiền bạc, công việc ổn định và sự thịnh vượng lâu dài";
+    } 
+    else {
+        // Đây là lá Major Arcana hoặc lá đặc biệt
+        if (isSpecialCard || currentDeckSize >= 79) {
+            // Chỉ hiển thị "Vũ Trụ" khi là lá đặc biệt hoặc deck 79/80
+            element = "Vũ Trụ"; 
+            elementEmoji = "✨";
+            elementDesc = isReversed 
+                ? "Bài học định mệnh đang bị kháng cự, cần buông bỏ để linh hồn tiến hóa" 
+                : "Bài học linh hồn lớn, kết nối trực tiếp với định mệnh vũ trụ";
+        } 
+        else {
+            // Deck 78 lá bình thường → Major Arcana KHÔNG hiện Vũ Trụ, chỉ hiện 4 nguyên tố
+            // Random 1 trong 4 nguyên tố để vẫn đẹp và cân bằng
+            const elements = [
+                { name: "Nước", emoji: "🌊", desc: isReversed ? "Cảm xúc sâu kín đang cần được giải phóng" : "Năng lượng tình cảm và trực giác" },
+                { name: "Lửa", emoji: "🔥", desc: isReversed ? "Đam mê bị kìm hãm hoặc quá mạnh" : "Sức mạnh sáng tạo và hành động" },
+                { name: "Khí", emoji: "💨", desc: isReversed ? "Tâm trí đang hỗn loạn" : "Trí tuệ và sự rõ ràng" },
+                { name: "Đất", emoji: "🌍", desc: isReversed ? "Nền tảng đang cần củng cố" : "Sự ổn định và thực tế" }
+            ];
+            const randomEl = elements[Math.floor(Math.random() * elements.length)];
+            element = randomEl.name;
+            elementEmoji = randomEl.emoji;
+            elementDesc = randomEl.desc;
+        }
+    }
+
+    // ── SỐ HỌC (giữ nguyên như cũ) ─────────────────────────────────────
+    if (card.id.includes("ace"))     { number = "1"; numberMeaning = isReversed ? "Khởi đầu bị trì hoãn hoặc sai hướng" : "Tiềm năng thuần khiết – hạt giống của một chương mới"; }
+    else if (card.id.includes("two")){ number = "2"; numberMeaning = isReversed ? "Mất cân bằng, do dự giữa hai lựa chọn" : "Sự kết nối, lựa chọn và hài hòa"; }
+    else if (card.id.includes("three")){ number = "3"; numberMeaning = isReversed ? "Xung đột nhóm hoặc sáng tạo bị kìm hãm" : "Sự phát triển, vui vẻ và sáng tạo bùng nổ"; }
+    else if (card.id.includes("four")){ number = "4"; numberMeaning = isReversed ? "Cứng nhắc, bế tắc, thiếu linh hoạt" : "Nền tảng vững chắc, ổn định lâu dài"; }
+    else if (card.id.includes("five")){ number = "5"; numberMeaning = isReversed ? "Thay đổi đột ngột, hỗn loạn và xung đột" : "Thách thức, bài học qua xung đột"; }
+    else if (card.id.includes("six")){ number = "6"; numberMeaning = isReversed ? "Mất cân bằng cho – nhận" : "Hài hòa, trao đổi và chữa lành"; }
+    else if (card.id.includes("seven")){ number = "7"; numberMeaning = isReversed ? "Ảo tưởng, né tránh sự thật" : "Suy tư sâu, tìm kiếm chân lý nội tâm"; }
+    else if (card.id.includes("eight")){ number = "8"; numberMeaning = isReversed ? "Kiệt sức, lặp lại vô ích" : "Sức mạnh vô hạn, kiên trì và thành tựu"; }
+    else if (card.id.includes("nine")){ number = "9"; numberMeaning = isReversed ? "Mãn nguyện giả tạo hoặc kiêu ngạo" : "Gần hoàn thành, thành tựu cá nhân cao"; }
+    else if (card.id.includes("ten")){ number = "10"; numberMeaning = isReversed ? "Chu kỳ kết thúc đau đớn" : "Hoàn thành một chu kỳ lớn, viên mãn"; }
+    else { number = "—"; numberMeaning = "Bài học định mệnh đặc biệt của linh hồn"; }
+
+    return { 
+        element: `${element} ${elementEmoji}`, 
+        elementDesc, 
+        number, 
+        numberMeaning 
+    };
+}
+
+// ====================== HÀM PHÂN TÍCH TẦNG LỚP Ý NGHĨA ĐA CHIỀU (ĐẦY ĐỦ NHẤT) ======================
+function getLayeredAnalysis(card, spreadType, positionIndex = 0) {
+    const isRev = card.isReversed;
+    const meaning = getContextualMeaning(card, spreadType, isRev, positionIndex);
+    const key = isRev ? card.reversedKeyword : card.keyword;
+    const elementInfo = getElementAndNumerology(card, isRev);
     const g1 = interpretationLayers.general[Math.floor(Math.random() * interpretationLayers.general.length)];
     const g2 = interpretationLayers.general[Math.floor(Math.random() * interpretationLayers.general.length)];
     const s1 = interpretationLayers[spreadType][Math.floor(Math.random() * interpretationLayers[spreadType].length)];
@@ -815,26 +1562,86 @@ function getContextualMeaning(card, spreadType, isReversed) {
     else if (spreadType === 'career') contextualText = `Trong <strong>sự nghiệp</strong>, `;
     else if (spreadType === 'journey') contextualText = `Trên <strong>hành trình linh hồn</strong>, `;
 
+    // Chọn ngẫu nhiên 1 trong 10 trường hợp
+    const karmaArray = karmaLayers[spreadType][isRev ? 'reversed' : 'upright'];
+    const soulArray = soulLayers[spreadType][isRev ? 'reversed' : 'upright'];
+    const karmaText = karmaArray[Math.floor(Math.random() * karmaArray.length)];
+    const soulText = soulArray[Math.floor(Math.random() * soulArray.length)];
+
     return `
         ${meaning}<br><br>
-        <span style="color:#e0d4ff;">${contextualText}lá ${card.name} mang thông điệp sâu về <strong>${key}</strong>.</span>
+        <span style="color:#e0d4ff;">${contextualText}lá <strong>${card.name}</strong> mang thông điệp sâu về <strong>${key}</strong>.</span>
+       
         <div class="layer-box">
             <span class="layer-title">🔮 Phân Tích Tầng Lớp Ý Nghĩa Đa Chiều</span>
+           
             <p><strong>Tầng Tổng Quát Từ Vũ Trụ:</strong> ${g1}</p>
             <p><strong>Tầng 2 – Năng Lượng Tiềm Thức:</strong> ${g2}</p>
             <p><strong>Tầng Chính Theo Trải Bài ${isRev ? '(Ngược)' : ''}:</strong> ${s1}</p>
-            <p style="font-style:italic; color:#d4af37; margin-top:12px;">Tất cả các tầng này hòa quyện chặt chẽ, tạo nên thông điệp hoàn chỉnh dành riêng cho bạn.</p>
+            <p><strong>Nguyên Tố:</strong>
+                <span style="color:#ffd700; font-weight:bold;">${elementInfo.element}</span><br>
+                ${elementInfo.elementDesc}
+            </p>
+           
+            <p><strong>Số Học:</strong>
+                Số <strong>${elementInfo.number}</strong> – ${elementInfo.numberMeaning}
+            </p>
+            <p><strong>Tầng Nhân Quả:</strong> ${karmaText}</p>
+            <p><strong>Tầng Linh Hồn:</strong> ${soulText}</p>
+            <p style="font-style:italic; color:#d4af37; margin-top:15px; line-height:1.6;">
+                Tất cả các tầng ý nghĩa này đang hòa quyện với nhau như một bản giao hưởng từ vũ trụ.<br>
+                Chúng không chỉ nói về hiện tại, mà còn dẫn dắt bạn đến con đường định mệnh mà linh hồn bạn đã chọn từ lâu.
+            </p>
         </div>`;
 }
-    function getClarifierLayeredAnalysis(mainCard, clarCard, spreadType) {
+  function getClarifierLayeredAnalysis(mainCard, clarCard, spreadType) {
     const mainMeaning = getContextualMeaning(mainCard, spreadType, mainCard.isReversed);
     const clarMeaning = getContextualMeaning(clarCard, spreadType, clarCard.isReversed);
 
-    const combineTemplates = [
-        `Lá chính ${mainCard.name} cho thấy ${mainMeaning}. Khi kết hợp với lá phụ ${clarCard.name}, thông điệp trở nên hoàn chỉnh hơn: ${clarMeaning}.`,
-        `Từ lá chính ${mainCard.name}, vũ trụ đang nói ${mainMeaning}. Lá phụ ${clarCard.name} bổ trợ bằng ${clarMeaning}.`,
-        `Hai lá ${mainCard.name} và ${clarCard.name} kết hợp tạo ra thông điệp mạnh mẽ: từ ${mainMeaning} dẫn đến ${clarMeaning}.`
-    ];
+    let combineTemplates = [];
+
+    if (spreadType === 'love') {
+        combineTemplates = [
+            `Lá chính <strong>${mainCard.name}</strong> hé lộ ${mainMeaning}. Lá phụ <strong>${clarCard.name}</strong> bổ trợ sâu sắc: ${clarMeaning}. Kết hợp hai lá cho thấy tình yêu này đang bước vào giai đoạn chuyển hóa quan trọng, đòi hỏi sự chân thành và chữa lành từ cả hai phía.`,
+            `Từ góc nhìn của lá chính, vũ trụ đang nói ${mainMeaning}. Lá phụ mang năng lượng ${clarMeaning}, tạo nên một mối liên kết định mệnh: tình yêu này không chỉ là cảm xúc mà còn là bài học linh hồn mà cả hai đã hẹn nhau từ kiếp trước.`,
+            `Hai lá ${mainCard.name} và ${clarCard.name} kết hợp tạo thành thông điệp rõ ràng: ${mainMeaning} cần được làm sâu thêm bởi ${clarMeaning}. Đây là lúc bạn và người ấy cùng nhau vượt qua lớp vỏ bề mặt để chạm đến tình yêu chân thực nhất.`,
+            `Lá chính nhắc nhở bạn về ${mainMeaning}. Lá phụ xác nhận và mở rộng: ${clarMeaning}. Vũ trụ đang sắp xếp để hai linh hồn chữa lành lẫn nhau và bước vào một mối quan hệ sâu sắc, bền vững hơn.`,
+            `Kết hợp hai lá cho thấy tình yêu đang ở ngã ba đường: ${mainMeaning} là nền tảng, còn ${clarMeaning} là chìa khóa để mở ra hạnh phúc thực sự. Hãy dũng cảm đối diện và tin tưởng.`,
+            `Lá chính mang năng lượng ${mainMeaning}, lá phụ bổ sung ${clarMeaning}. Đây chính là dấu hiệu của một tình yêu định mệnh – nơi cả hai cùng trưởng thành và chữa lành vết thương cũ.`,
+            `Từ lá chính đến lá phụ là một hành trình từ ${mainMeaning} đến ${clarMeaning}. Vũ trụ đang thì thầm rằng tình yêu này sẽ trở nên hoàn hảo khi bạn biết buông bỏ và tin tưởng.`,
+            `Hai lá tạo nên sự hài hòa hoàn hảo: ${mainMeaning} là lời mời gọi, ${clarMeaning} là câu trả lời. Tình yêu của bạn đang được vũ trụ ban phước mạnh mẽ.`,
+            `Lá chính cảnh báo ${mainMeaning}, lá phụ mang hy vọng ${clarMeaning}. Đây là cơ hội để tình yêu chuyển từ thử thách thành bài học đẹp nhất của kiếp này.`,
+            `Kết hợp hai lá cho thấy tình yêu đang được vũ trụ “nâng cấp”: từ ${mainMeaning} sang ${clarMeaning}. Hãy mở lòng đón nhận sự thay đổi tích cực này.`
+        ];
+    } 
+    else if (spreadType === 'career') {
+        combineTemplates = [
+            `Lá chính <strong>${mainCard.name}</strong> cho thấy ${mainMeaning}. Lá phụ <strong>${clarCard.name}</strong> bổ trợ: ${clarMeaning}. Hai lá kết hợp khẳng định con đường sự nghiệp của bạn đang được vũ trụ hỗ trợ mạnh mẽ.`,
+            `Từ lá chính ${mainMeaning}, lá phụ mang đến ${clarMeaning}. Đây là dấu hiệu rõ ràng rằng bạn đang ở ngưỡng cửa của một bước tiến lớn trong sự nghiệp.`,
+            `Hai lá ${mainCard.name} + ${clarCard.name} tạo nên thông điệp: ${mainMeaning} là nền tảng, ${clarMeaning} là động lực. Thành công đang đến rất gần nếu bạn kiên trì.`,
+            `Lá chính nhắc về ${mainMeaning}, lá phụ xác nhận ${clarMeaning}. Vũ trụ đang mở ra cơ hội thăng tiến rõ ràng trong công việc.`,
+            `Kết hợp hai lá cho thấy sự nghiệp đang chuyển từ giai đoạn thử thách (${mainMeaning}) sang giai đoạn thu hoạch (${clarMeaning}). Hãy nắm bắt ngay.`,
+            `Lá chính mang năng lượng ${mainMeaning}, lá phụ bổ sung ${clarMeaning}. Đây là lúc bạn được vũ trụ trao tặng cơ hội lớn trong sự nghiệp.`,
+            `Hai lá tạo nên sự cân bằng hoàn hảo giữa ${mainMeaning} và ${clarMeaning}. Con đường sự nghiệp của bạn đang được sắp xếp theo ý trời.`,
+            `Từ ${mainMeaning} của lá chính đến ${clarMeaning} của lá phụ là một chuỗi chuyển hóa tích cực. Thành công vật chất và danh tiếng đang chờ bạn.`,
+            `Lá chính cảnh báo ${mainMeaning}, lá phụ mang giải pháp ${clarMeaning}. Đây chính là chìa khóa để bạn vượt qua thử thách và vươn lên.`,
+            `Kết hợp hai lá khẳng định: ${mainMeaning} là bài học, ${clarMeaning} là phần thưởng. Sự nghiệp của bạn đang đi đúng hướng định mệnh.`
+        ];
+    } 
+    else { // journey
+        combineTemplates = [
+            `Lá chính <strong>${mainCard.name}</strong> hé lộ ${mainMeaning}. Lá phụ <strong>${clarCard.name}</strong> bổ trợ: ${clarMeaning}. Hai lá cùng nhau vẽ nên một bước chuyển mình quan trọng trên hành trình linh hồn.`,
+            `Từ ${mainMeaning} của lá chính đến ${clarMeaning} của lá phụ là thông điệp vũ trụ: bạn đang được dẫn dắt đến tầng thức tỉnh cao hơn.`,
+            `Hai lá kết hợp tạo thành một chu kỳ hoàn chỉnh: ${mainMeaning} là bài học, ${clarMeaning} là ánh sáng dẫn lối trên hành trình linh hồn.`,
+            `Lá chính nhắc nhở ${mainMeaning}, lá phụ xác nhận ${clarMeaning}. Đây là dấu hiệu rõ ràng rằng linh hồn bạn đang lột xác mạnh mẽ.`,
+            `Kết hợp hai lá cho thấy hành trình đang chuyển từ bóng tối (${mainMeaning}) sang ánh sáng (${clarMeaning}). Bạn đang được vũ trụ ôm ấp.`,
+            `Lá chính mang năng lượng ${mainMeaning}, lá phụ bổ sung ${clarMeaning}. Đây là khoảnh khắc quan trọng nhất của hành trình linh hồn hiện tại.`,
+            `Hai lá tạo nên sự đồng bộ hoàn hảo giữa ${mainMeaning} và ${clarMeaning}. Vũ trụ đang đẩy bạn tiến gần hơn đến bản ngã cao nhất.`,
+            `Từ lá chính đến lá phụ là dòng chảy từ ${mainMeaning} đến ${clarMeaning}. Hành trình của bạn đang đồng bộ với nhịp điệu của vũ trụ.`,
+            `Lá chính cảnh báo ${mainMeaning}, lá phụ mang hy vọng ${clarMeaning}. Đây là lúc linh hồn bạn được tái sinh và chữa lành sâu sắc.`,
+            `Kết hợp hai lá khẳng định: bạn đang đi đúng con đường định mệnh. ${mainMeaning} là nền tảng, ${clarMeaning} là phần thưởng của hành trình linh hồn.`
+        ];
+    }
 
     const randomCombine = combineTemplates[Math.floor(Math.random() * combineTemplates.length)];
 
@@ -860,7 +1667,7 @@ function renderDetails() {
             let html = `
                 <div class="detail-box">
                     <div class="detail-title">${pos.title}: <span>${card.name} ${card.isReversed ? '(Ngược)' : ''}</span></div>
-                    ${getLayeredAnalysis(card, currentSpreadType)}
+                    ${getLayeredAnalysis(card, currentSpreadType ,index)}
             `;
             if (clarifierCards[index]) {
                 html += getClarifierLayeredAnalysis(card, clarifierCards[index], currentSpreadType);
@@ -960,7 +1767,15 @@ const cardExtras = {
     "page-of-pentacles": { person: "Học trò chăm chỉ – Young Isaac Newton", quote: "“Cơ hội học hỏi mới đang đến.”" },
     "knight-of-pentacles": { person: "Người nông dân đáng tin – Saint Isidore", quote: "“Chăm chỉ và kiên trì là chìa khóa.”" },
     "queen-of-pentacles": { person: "Nữ hoàng chu đáo – Queen Victoria", quote: "“Bạn đang nuôi dưỡng cả sự nghiệp lẫn bản thân.”" },
-    "king-of-pentacles": { person: "Vua giàu có – King Midas (phiên bản khôn ngoan)", quote: "“Thành công vật chất và ổn định đang thuộc về bạn.”" }
+    "king-of-pentacles": { person: "Vua giàu có – King Midas (phiên bản khôn ngoan)", quote: "“Thành công vật chất và ổn định đang thuộc về bạn.”" },
+    "the-unknown": {
+        person: "Socrates – Nhà triết học Hy Lạp cổ đại",
+        quote: "“Điều duy nhất tôi biết chắc chắn là tôi không biết gì cả.”"
+    },
+    "the-cosmos": {
+        person: "Carl Sagan – Nhà thiên văn học nổi tiếng",
+        quote: "“Chúng ta là cách vũ trụ tự nhận thức về chính mình.”"
+    },
 };
 
      function generateSummary() {
@@ -1106,7 +1921,7 @@ const cardExtras = {
     
     localStorage.setItem('tarotHistory', JSON.stringify(readingHistory));
     
-    alert('✅ Đã lưu trải bài thành công!\nBao gồm cả "Thông điệp liên kết từ vũ trụ".');
+    alert('✅ Đã lưu trải bài thành công!');
 }
 
         function showHistory() {
@@ -1160,7 +1975,7 @@ const cardExtras = {
             document.getElementById('readingHeader').innerHTML = `📜 Trải Bài ${reading.spreadName} • ${reading.timestamp}`;
 
             let htmlCards = '';
-            reading.cards.forEach((item) => {
+            reading.cards.forEach((item ,index) => {
                 const card = item.card;
                 const emoji = card.isReversed ? card.reversedEmoji : card.emoji;
                 const revText = card.isReversed ? '<span style="color:#ff6b6b; font-size:0.8rem;">(Ngược)</span>' : '';
@@ -1209,7 +2024,7 @@ const cardExtras = {
                 let detailHTML = `
                     <div class="detail-box">
                         <div class="detail-title">${item.position.title}: <span>${card.name} ${card.isReversed ? '(Ngược)' : ''}</span></div>
-                        ${getLayeredAnalysis(card, reading.spreadType)}
+                        ${getLayeredAnalysis(card, reading.spreadType,index)}
                 `;
                 if (item.clarifier) {
                     detailHTML += getClarifierLayeredAnalysis(card, item.clarifier, reading.spreadType);
@@ -1228,6 +2043,24 @@ const cardExtras = {
                 document.getElementById('detailsContainer').innerHTML += cosmicHTML;
             }
         }
+        
+// ====================== CÁC HÀM CÀI ĐẶT BỘ BÀI ======================
+function showSettings() {
+    document.getElementById('settingsModal').style.display = 'flex';
+}
+
+function hideSettings() {
+    document.getElementById('settingsModal').style.display = 'none';
+}
+
+function changeDeckSize(size) {
+    currentDeckSize = size;
+    const msg = size === 78 ? "✅ Đã chuyển sang bộ 78 lá chuẩn" :
+                size === 79 ? "✅ Đã chuyển sang bộ 79 lá (thêm The Unknown)" :
+                "✅ Đã chuyển sang bộ 80 lá (thêm The Unknown & The Cosmos)";
+    alert(msg);
+    hideSettings();
+}
     </script>
 </body>
 </html>
